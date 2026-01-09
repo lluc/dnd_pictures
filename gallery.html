@@ -1,0 +1,455 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>D&D 5e Image Gallery</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+            min-height: 100vh;
+            color: #e8e8e8;
+        }
+
+        header {
+            background: rgba(0, 0, 0, 0.4);
+            padding: 20px;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            backdrop-filter: blur(10px);
+            border-bottom: 2px solid #c9a227;
+        }
+
+        h1 {
+            text-align: center;
+            color: #c9a227;
+            font-size: 2.5rem;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+            margin-bottom: 20px;
+        }
+
+        .controls {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            justify-content: center;
+            align-items: center;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .search-box {
+            flex: 1;
+            min-width: 250px;
+            max-width: 400px;
+        }
+
+        .search-box input {
+            width: 100%;
+            padding: 12px 20px;
+            border: 2px solid #c9a227;
+            border-radius: 25px;
+            background: rgba(255, 255, 255, 0.1);
+            color: #fff;
+            font-size: 1rem;
+            outline: none;
+            transition: all 0.3s;
+        }
+
+        .search-box input::placeholder {
+            color: #aaa;
+        }
+
+        .search-box input:focus {
+            background: rgba(255, 255, 255, 0.2);
+            box-shadow: 0 0 15px rgba(201, 162, 39, 0.3);
+        }
+
+        .filter-buttons {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            justify-content: center;
+        }
+
+        .filter-btn {
+            padding: 10px 20px;
+            border: 2px solid #c9a227;
+            border-radius: 20px;
+            background: transparent;
+            color: #c9a227;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-transform: capitalize;
+        }
+
+        .filter-btn:hover {
+            background: rgba(201, 162, 39, 0.2);
+        }
+
+        .filter-btn.active {
+            background: #c9a227;
+            color: #1a1a2e;
+        }
+
+        .stats {
+            text-align: center;
+            padding: 10px;
+            color: #888;
+            font-size: 0.9rem;
+        }
+
+        main {
+            padding: 20px;
+            max-width: 1600px;
+            margin: 0 auto;
+        }
+
+        .category-section {
+            margin-bottom: 40px;
+        }
+
+        .category-title {
+            color: #c9a227;
+            font-size: 1.8rem;
+            padding: 15px 0;
+            border-bottom: 2px solid rgba(201, 162, 39, 0.3);
+            margin-bottom: 20px;
+            text-transform: capitalize;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .category-title .count {
+            font-size: 1rem;
+            color: #888;
+            font-weight: normal;
+        }
+
+        .gallery {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+            gap: 20px;
+        }
+
+        .image-card {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 12px;
+            overflow: hidden;
+            transition: all 0.3s;
+            cursor: pointer;
+            border: 1px solid rgba(201, 162, 39, 0.2);
+        }
+
+        .image-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(201, 162, 39, 0.2);
+            border-color: #c9a227;
+        }
+
+        .image-card.hidden {
+            display: none;
+        }
+
+        .image-card img {
+            width: 100%;
+            height: 180px;
+            object-fit: cover;
+            background: rgba(0, 0, 0, 0.3);
+        }
+
+        .image-card .name {
+            padding: 12px;
+            text-align: center;
+            font-size: 0.85rem;
+            color: #ddd;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        /* Lightbox */
+        .lightbox {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.95);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            padding: 20px;
+        }
+
+        .lightbox.active {
+            display: flex;
+        }
+
+        .lightbox-close {
+            position: absolute;
+            top: 20px;
+            right: 30px;
+            font-size: 3rem;
+            color: #c9a227;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .lightbox-close:hover {
+            color: #fff;
+            transform: rotate(90deg);
+        }
+
+        .lightbox img {
+            max-width: 90%;
+            max-height: 80vh;
+            border-radius: 10px;
+            box-shadow: 0 0 50px rgba(201, 162, 39, 0.3);
+        }
+
+        .lightbox-title {
+            color: #c9a227;
+            font-size: 1.5rem;
+            margin-top: 20px;
+            text-align: center;
+        }
+
+        .lightbox-category {
+            color: #888;
+            font-size: 1rem;
+            margin-top: 5px;
+            text-transform: capitalize;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 1.8rem;
+            }
+
+            .gallery {
+                grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+                gap: 15px;
+            }
+
+            .image-card img {
+                height: 140px;
+            }
+
+            .filter-btn {
+                padding: 8px 15px;
+                font-size: 0.8rem;
+            }
+        }
+
+        /* Loading animation */
+        .image-card img {
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        .image-card img.loaded {
+            opacity: 1;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>D&D 5e Image Collection</h1>
+        <div class="controls">
+            <div class="search-box">
+                <input type="search" id="search" placeholder="Rechercher une image...">
+            </div>
+            <div class="filter-buttons">
+                <button class="filter-btn active" data-filter="all">Tout (1018)</button>
+                <button class="filter-btn" data-filter="equipment">Equipment (237)</button>
+                <button class="filter-btn" data-filter="magic-items">Magic Items (361)</button>
+                <button class="filter-btn" data-filter="monsters">Monsters (334)</button>
+                <button class="filter-btn" data-filter="proficiencies">Proficiencies (86)</button>
+            </div>
+        </div>
+        <div class="stats" id="stats">1018 images affichées</div>
+    </header>
+
+    <main id="gallery-container">
+        <!-- Equipment -->
+        <section class="category-section" data-category="equipment">
+            <h2 class="category-title">Equipment <span class="count">(237)</span></h2>
+            <div class="gallery" id="gallery-equipment"></div>
+        </section>
+
+        <!-- Magic Items -->
+        <section class="category-section" data-category="magic-items">
+            <h2 class="category-title">Magic Items <span class="count">(361)</span></h2>
+            <div class="gallery" id="gallery-magic-items"></div>
+        </section>
+
+        <!-- Monsters -->
+        <section class="category-section" data-category="monsters">
+            <h2 class="category-title">Monsters <span class="count">(334)</span></h2>
+            <div class="gallery" id="gallery-monsters"></div>
+        </section>
+
+        <!-- Proficiencies -->
+        <section class="category-section" data-category="proficiencies">
+            <h2 class="category-title">Proficiencies <span class="count">(86)</span></h2>
+            <div class="gallery" id="gallery-proficiencies"></div>
+        </section>
+    </main>
+
+    <!-- Lightbox -->
+    <div class="lightbox" id="lightbox">
+        <span class="lightbox-close" id="lightbox-close">&times;</span>
+        <img id="lightbox-img" src="" alt="">
+        <div class="lightbox-title" id="lightbox-title"></div>
+        <div class="lightbox-category" id="lightbox-category"></div>
+    </div>
+
+    <script>
+        // Image data
+        const imageData = {
+            "equipment": ["abacus","acid_(vial)","alchemist's_fire_(flask)","alchemist's_supplies","alms_box","amulet","animal_feed_(1_day)","antitoxin_(vial)","arrow","backpack","bagpipes","ball_bearings_(bag_of_1,000)","barding__breastplate","barding__chain_mail","barding__chain_shirt","barding__half_plate","barding__hide","barding__leather","barding__padded","barding__plate","barding__ring_mail","barding__scale_mail","barding__splint","barding__studded_leather","barrel","basket","battleaxe","bedroll","bell","bit_and_bridle","blanket","block_and_tackle","block_of_incense","blowgun_needle","blowgun","book","bottle,_glass","breastplate","brewer's_supplies","bucket","burglar's_pack","calligrapher's_supplies","caltrops","camel","candle","carpenter's_tools","carriage","cartographer's_tools","cart","case,_crossbow_bolt","case,_map_or_scroll","censer","chain_(10_feet)","chain_mail","chain_shirt","chalk_(1_piece)","chariot","chest","climber's_kit","clothes,_common","clothes,_costume","clothes,_fine","clothes,_traveler's","club","cobbler's_tools","component_pouch","cook's_utensils","crossbow_bolt","crossbow,_hand","crossbow,_heavy","crossbow,_light","crowbar","crystal","dagger","dart","dice_set","diplomat's_pack","disguise_kit","donkey","drum","dulcimer","dungeoneer's_pack","elephant","emblem","entertainer's_pack","explorer's_pack","fishing_tackle","flail","flask_or_tankard","flute","forgery_kit","galley","glaive","glassblower's_tools","grappling_hook","greataxe","greatclub","greatsword","halberd","half_plate_armor","hammer,_sledge","hammer","handaxe","healer's_kit","herbalism_kit","hide_armor","holy_water_(flask)","horn","horse,_draft","horse,_riding","hourglass","hunting_trap","ink_(1_ounce_bottle)","ink_pen","javelin","jeweler's_tools","jug_or_pitcher","keelboat","ladder_(10-foot)","lamp","lance","lantern,_bullseye","lantern,_hooded","leather_armor","leatherworker's_tools","light_hammer","little_bag_of_sand","lock","longbow","longship","longsword","lute","lyre","mace","magnifying_glass","manacles","mason's_tools","mastiff","maul","mess_kit","mirror,_steel","morningstar","mule","navigator's_tools","net","oil_(flask)","orb","padded_armor","painter's_supplies","pan_flute","paper_(one_sheet)","parchment_(one_sheet)","perfume_(vial)","pick,_miner's","pike","piton","plate_armor","playing_card_set","poison,_basic_(vial)","poisoner's_kit","pole_(10-foot)","pony","pot,_iron","potter's_tools","pouch","priest's_pack","quarterstaff","quiver","ram,_portable","rapier","rations_(1_day)","reliquary","ring_mail","robes","rod","rope,_hempen_(50_feet)","rope,_silk_(50_feet)","rowboat","sack","saddlebags","saddle,_exotic","saddle,_military","saddle,_pack","saddle,_riding","sailing_ship","scale_mail","scale,_merchant's","scholar's_pack","scimitar","sealing_wax","shawm","shield","shortbow","shortsword","shovel","sickle","signal_whistle","signet_ring","sled","sling_bullet","sling","small_knife","smith's_tools","soap","spear","spellbook","spike,_iron","splint_armor","sprig_of_mistletoe","spyglass","stabling_(1_day)","staff","string_(10_feet)","studded_leather_armor","tent,_two-person","thieves'_tools","tinderbox","tinker's_tools","torch","totem","trident","vestments","vial","viol","wagon","wand","warhammer","warhorse","war_pick","warship","waterskin","weaver's_tools","whetstone","whip","woodcarver's_tools","wooden_staff","yew_wand"],
+            "magic-items": ["adamantine_armor","air_elemental_gem","ammunition,_+1,_+2,_or_+3","ammunition,_+1","ammunition,_+2","ammunition,_+3","amulet_of_health","amulet_of_proof_against_detection_and_location","amulet_of_the_planes","anchor_feather_token","animated_shield","apparatus_of_the_crab","armor,_+1,_+2,_or_+3","armor,_+1","armor,_+2","armor,_+3","armor_of_invulnerability","armor_of_resistance","armor_of_vulnerability","arrow-catching_shield","arrow_of_slaying","bag_of_beans","bag_of_devouring","bag_of_holding","bag_of_tricks","bead_of_force","belt_of_cloud_giant_strength","belt_of_dwarvenkind","belt_of_fire_giant_strength","belt_of_frost_giant_strength","belt_of_giant_strength","belt_of_hill_giant_strength","belt_of_stone_giant_strength","belt_of_storm_giant_strength","berserker_axe","bird_feather_token","black_dragon_scale_mail","blue_dragon_scale_mail","boots_of_elvenkind","boots_of_levitation","boots_of_speed","boots_of_striding_and_springing","boots_of_the_winterlands","bowl_of_commanding_water_elementals","bracers_of_archery","bracers_of_defense","brass_dragon_scale_mail","brass_horn_of_valhalla","brazier_of_commanding_fire_elementals","bronze_dragon_scale_mail","bronze_griffon_figurine_of_wondrous_power","bronze_horn_of_valhalla","brooch_of_shielding","broom_of_flying","candle_of_invocation","cape_of_the_mountebank","carpet_of_flying_(3_ft._×_5_ft.)","carpet_of_flying_(4_ft._×_6_ft.)","carpet_of_flying_(5_ft._×_7_ft.)","carpet_of_flying_(6_ft._×_9_ft.)","carpet_of_flying","censer_of_controlling_air_elementals","chime_of_opening","circlet_of_blasting","cloak_of_arachnida","cloak_of_displacement","cloak_of_elvenkind","cloak_of_protection","cloak_of_the_bat","cloak_of_the_manta_ray","copper_dragon_scale_mail","crystal_ball_of_mind_reading","crystal_ball_of_telepathy","crystal_ball_of_true_seeing","crystal_ball","cube_of_force","cubic_gate","dagger_of_venom","dancing_sword","decanter_of_endless_water","deck_of_illusions","deck_of_many_things","defender","demon_armor","dimensional_shackles","dragon_scale_mail","dragon_slayer","dust_of_disappearance","dust_of_dryness","dust_of_sneezing_and_choking","dwarven_plate","dwarven_thrower","earth_elemental_gem","ebony_fly_figurine_of_wondrous_power","efficient_quiver","efreeti_bottle","elemental_gem","elven_chain","eversmoking_bottle","eyes_of_charming","eyes_of_minute_seeing","eyes_of_the_eagle","fan_feather_token","feather_token","figurine_of_wondrous_power","fire_elemental_gem","flame_tongue","folding_boat","frost_brand","gauntlets_of_ogre_power","gem_of_brightness","gem_of_seeing","giant_slayer","glamoured_studded_leather_armor","gloves_of_missile_snaring","gloves_of_swimming_and_climbing","goggles_of_night","gold_dragon_scale_mail","golden_lions_figurine_of_wondrous_power","gray_bag_of_tricks","green_dragon_scale_mail","hammer_of_thunderbolts","handy_haversack","hat_of_disguise","headband_of_intellect","helm_of_brilliance","helm_of_comprehending_languages","helm_of_telepathy","helm_of_teleportation","holy_avenger","horn_of_blasting","horn_of_valhalla","horseshoes_of_a_zephyr","horseshoes_of_speed","immovable_rod","instant_fortress","ioun_stone_of_absorption","ioun_stone_of_agility","ioun_stone_of_awareness","ioun_stone_of_fortitude","ioun_stone_of_greater_absorption","ioun_stone_of_insight","ioun_stone_of_intellect","ioun_stone_of_leadership","ioun_stone_of_mastery","ioun_stone_of_protection","ioun_stone_of_regeneration","ioun_stone_of_reserve","ioun_stone_of_strength","ioun_stone_of_sustenance","ioun_stone","iron_bands_of_binding","iron_flask","iron_horn_of_valhalla","ivory_goats_figurine_of_wondrous_power","javelin_of_lightning","lantern_of_revealing","luck_blade","mace_of_disruption","mace_of_smiting","mace_of_terror","mantle_of_spell_resistance","manual_of_bodily_health","manual_of_clay_golems","manual_of_flesh_golems","manual_of_gainful_exercise","manual_of_golems","manual_of_iron_golems","manual_of_quickness_of_action","manual_of_stone_golems","marble_elephant_figurine_of_wondrous_power","marvelous_pigments","medallion_of_thoughts","mirror_of_life_trapping","mithral_armor","necklace_of_adaptation","necklace_of_fireballs","necklace_of_prayer_beads","nine_lives_stealer","oathbow","obsidian_steed_figurine_of_wondrous_power","oil_of_etherealness","oil_of_sharpness","oil_of_slipperiness","onyx_dog_figurine_of_wondrous_power","orb_of_dragonkind","pearl_of_power","periapt_of_health","periapt_of_proof_against_poison","periapt_of_wound_closure","philter_of_love","pipes_of_haunting","pipes_of_the_sewers","plate_armor_of_etherealness","portable_hole","potion_of_acid_resistance","potion_of_animal_friendship","potion_of_clairvoyance","potion_of_climbing","potion_of_cloud_giant_strength","potion_of_cold_resistance","potion_of_diminution","potion_of_fire_giant_strength","potion_of_fire_resistance","potion_of_flying","potion_of_force_resistance","potion_of_frost_giant_strength","potion_of_gaseous_form","potion_of_giant_strength","potion_of_greater_healing","potion_of_growth","potion_of_healing","potion_of_heroism","potion_of_hill_giant_strength","potion_of_invisibility","potion_of_lightning_resistance","potion_of_mind_reading","potion_of_necrotic_resistance","potion_of_poison_resistance","potion_of_poison","potion_of_psychic_resistance","potion_of_radiant_resistance","potion_of_resistance","potion_of_speed","potion_of_stone_giant_strength","potion_of_storm_giant_strength","potion_of_superior_healing","potion_of_supreme_healing","potion_of_thunder_resistance","potion_of_water_breathing","red_dragon_scale_mail","restorative_ointment","ring_of_acid_resistance","ring_of_air_elemental_command","ring_of_animal_influence","ring_of_cold_resistance","ring_of_djinni_summoning","ring_of_earth_elemental_command","ring_of_elemental_command","ring_of_evasion","ring_of_feather_falling","ring_of_fire_elemental_command","ring_of_fire_resistance","ring_of_force_resistance","ring_of_free_action","ring_of_invisibility","ring_of_jumping","ring_of_lightning_resistance","ring_of_mind_shielding","ring_of_necrotic_resistance","ring_of_poison_resistance","ring_of_protection","ring_of_psychic_resistance","ring_of_radiant_resistance","ring_of_regeneration","ring_of_resistance","ring_of_shooting_stars","ring_of_spell_storing","ring_of_spell_turning","ring_of_swimming","ring_of_telekinesis","ring_of_the_ram","ring_of_three_wishes","ring_of_thunder_resistance","ring_of_warmth","ring_of_water_elemental_command","ring_of_water_walking","ring_of_x-ray_vision","robe_of_eyes","robe_of_scintillating_colors","robe_of_stars","robe_of_the_archmagi","robe_of_useful_items","rod_of_absorption","rod_of_alertness","rod_of_lordly_might","rod_of_rulership","rod_of_security","rope_of_climbing","rope_of_entanglement","rust_bag_of_tricks","scarab_of_protection","scimitar_of_speed","serpentine_owl_figurine_of_wondrous_power","shield_of_missile_attraction","silver_dragon_scale_mail","silver_horn_of_valhalla","silver_raven_figurine_of_wondrous_power","slippers_of_spider_climbing","sovereign_glue","spellguard_shield","spell_scroll_(1st)","spell_scroll_(2nd)","spell_scroll_(3rd)","spell_scroll_(4th)","spell_scroll_(5th)","spell_scroll_(6th)","spell_scroll_(7th)","spell_scroll_(8th)","spell_scroll_(9th)","spell_scroll_(cantrip)","spell_scroll","sphere_of_annihilation","staff_of_charming","staff_of_fire","staff_of_frost","staff_of_healing","staff_of_power","staff_of_striking","staff_of_swarming_insects","staff_of_the_magi","staff_of_the_python","staff_of_the_woodlands","staff_of_thunder_and_lightning","staff_of_withering","stone_of_controlling_earth_elementals","stone_of_good_luck_(luckstone)","sun_blade","swan_boat_feather_token","sword_of_life_stealing","sword_of_sharpness","sword_of_wounding","talisman_of_pure_good","talisman_of_the_sphere","talisman_of_ultimate_evil","tan_bag_of_tricks","tome_of_clear_thought","tome_of_leadership_and_influence","tome_of_understanding","tree_feather_token","trident_of_fish_command","universal_solvent","vicious_weapon","vorpal_sword","wand_of_binding","wand_of_enemy_detection","wand_of_fear","wand_of_fireballs","wand_of_lightning_bolts","wand_of_magic_detection","wand_of_magic_missiles","wand_of_paralysis","wand_of_polymorph","wand_of_secrets","wand_of_the_war_mage,_+1,_+2,_or_+3","wand_of_the_war_mage,_+1","wand_of_the_war_mage,_+2","wand_of_the_war_mage,_+3","wand_of_web","wand_of_wonder","water_elemental_gem","weapon,_+1,_+2,_or_+3","weapon,_+1","weapon,_+2","weapon,_+3","well_of_many_worlds","whip_feather_token","white_dragon_scale_mail","wind_fan","winged_boots","wings_of_flying"],
+            "monsters": ["aboleth","acolyte","adult_black_dragon","adult_blue_dragon","adult_brass_dragon","adult_bronze_dragon","adult_copper_dragon","adult_gold_dragon","adult_green_dragon","adult_red_dragon","adult_silver_dragon","adult_white_dragon","air_elemental","ancient_black_dragon","ancient_blue_dragon","ancient_brass_dragon","ancient_bronze_dragon","ancient_copper_dragon","ancient_gold_dragon","ancient_green_dragon","ancient_red_dragon","ancient_silver_dragon","ancient_white_dragon","androsphinx","animated_armor","ankheg","ape","archmage","assassin","awakened_shrub","awakened_tree","axe_beak","azer","baboon","badger","balor","bandit_captain","bandit","barbed_devil","basilisk","bat","bearded_devil","behir","berserker","black_bear","black_dragon_wyrmling","black_pudding","blink_dog","blood_hawk","blue_dragon_wyrmling","boar","bone_devil","brass_dragon_wyrmling","bronze_dragon_wyrmling","brown_bear","bugbear","bulette","camel","cat","centaur","chain_devil","chimera","chuul","clay_golem","cloaker","cloud_giant","cockatrice","commoner","constrictor_snake","copper_dragon_wyrmling","couatl","crab","crocodile","cult_fanatic","cultist","darkmantle","death_dog","deep_gnome_(svirfneblin)","deer","deva","dire_wolf","djinni","doppelganger","draft_horse","dragon_turtle","dretch","drider","drow","druid","dryad","duergar","dust_mephit","eagle","earth_elemental","efreeti","elephant","elk","erinyes","ettercap","ettin","fire_elemental","fire_giant","flesh_golem","flying_snake","flying_sword","frog","frost_giant","gargoyle","gelatinous_cube","ghast","ghost","ghoul","giant_ape","giant_badger","giant_bat","giant_boar","giant_centipede","giant_constrictor_snake","giant_crab","giant_crocodile","giant_eagle","giant_elk","giant_fire_beetle","giant_frog","giant_goat","giant_hyena","giant_lizard","giant_octopus","giant_owl","giant_poisonous_snake","giant_rat_(diseased)","giant_rat","giant_scorpion","giant_sea_horse","giant_shark","giant_spider","giant_toad","giant_vulture","giant_wasp","giant_weasel","giant_wolf_spider","gibbering_mouther","glabrezu","gladiator","gnoll","goat","goblin","gold_dragon_wyrmling","gorgon","gray_ooze","green_dragon_wyrmling","green_hag","grick","griffon","grimlock","guardian_naga","guard","gynosphinx","half-red_dragon_veteran","harpy","hawk","hell_hound","hezrou","hill_giant","hippogriff","hobgoblin","homunculus","horned_devil","hunter_shark","hydra","hyena","ice_devil","ice_mephit","imp","invisible_stalker","iron_golem","jackal","killer_whale","knight","kobold","kraken","lamia","lemure","lich","lion","lizardfolk","lizard","mage","magma_mephit","magmin","mammoth","manticore","marilith","mastiff","medusa","merfolk","merrow","mimic","minotaur_skeleton","minotaur","mule","mummy_lord","mummy","nalfeshnee","night_hag","nightmare","noble","ochre_jelly","octopus","ogre","ogre_zombie","oni","orc","otyugh","owlbear","owl","panther","pegasus","phase_spider","pit_fiend","planetar","plesiosaurus","poisonous_snake","polar_bear","pony","priest","pseudodragon","purple_worm","quasit","quipper","rakshasa","rat","raven","red_dragon_wyrmling","reef_shark","remorhaz","rhinoceros","riding_horse","roc","roper","rug_of_smothering","rust_monster","saber-toothed_tiger","sahuagin","salamander","satyr","scorpion","scout","sea_hag","sea_horse","shadow","shambling_mound","shield_guardian","shrieker","silver_dragon_wyrmling","skeleton","solar","specter","spider","spirit_naga","sprite","spy","steam_mephit","stirge","stone_giant","stone_golem","storm_giant","succubus_incubus","swarm_of_bats","swarm_of_beetles","swarm_of_centipedes","swarm_of_insects","swarm_of_poisonous_snakes","swarm_of_quippers","swarm_of_rats","swarm_of_ravens","swarm_of_spiders","swarm_of_wasps","tarrasque","thug","tiger","treant","tribal_warrior","triceratops","troll","tyrannosaurus_rex","unicorn","vampire,_bat_form","vampire,_mist_form","vampire_spawn","vampire,_vampire_form","veteran","violet_fungus","vrock","vulture","warhorse_skeleton","warhorse","water_elemental","weasel","werebear,_bear_form","werebear,_human_form","werebear,_hybrid_form","wereboar,_boar_form","wereboar,_human_form","wereboar,_hybrid_form","wererat,_human_form","wererat,_hybrid_form","wererat,_rat_form","weretiger,_human_form","weretiger,_hybrid_form","weretiger,_tiger_form","werewolf,_human_form","werewolf,_hybrid_form","werewolf,_wolf_form","white_dragon_wyrmling","wight","will-o'-wisp","winter_wolf","wolf","worg","wraith","wyvern","xorn","young_black_dragon","young_blue_dragon","young_brass_dragon","young_bronze_dragon","young_copper_dragon","young_gold_dragon","young_green_dragon","young_red_dragon","young_silver_dragon","young_white_dragon","zombie"],
+            "proficiencies": ["alchemist's_supplies","all_armor","battleaxes","blowguns","breastplate","brewer's_supplies","calligrapher's_supplies","carpenter's_tools","cartographer's_tools","chain_mail","chain_shirt","clubs","cobbler's_tools","cook's_utensils","crossbows,_heavy","crossbows,_light","daggers","darts","dice_set","disguise_kit","flails","forgery_kit","glaives","glassblower's_tools","greataxes","greatclubs","greatswords","halberds","half_plate_armor","handaxes","hand_crossbows","heavy_armor","herbalism_kit","hide_armor","javelins","jeweler's_tools","lances","leather_armor","leatherworker's_tools","light_armor","light_hammers","longbows","longswords","lute","lyre","maces","martial_weapons","mason's_tools","mauls","medium_armor","morningstars","navigator's_tools","nets","padded_armor","painter's_supplies","pan_flute","pikes","plate_armor","playing_card_set","poisoner's_kit","potter's_tools","quarterstaffs","rapiers","ring_mail","scale_mail","scimitars","shawm","shields","shortbows","shortswords","sickles","simple_weapons","slings","smith's_tools","spears","splint_armor","studded_leather_armor","thieves'_tools","tinker's_tools","tridents","viol","war_picks","warhammers","weaver's_tools","whips","woodcarver's_tools"]
+        };
+
+        // Format name for display
+        function formatName(filename) {
+            return filename
+                .replace(/_/g, ' ')
+                .replace(/,/g, ', ')
+                .replace(/\(/g, ' (')
+                .replace(/\s+/g, ' ')
+                .split(' ')
+                .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+                .join(' ')
+                .trim();
+        }
+
+        // Create image card
+        function createImageCard(category, filename) {
+            const card = document.createElement('div');
+            card.className = 'image-card';
+            card.dataset.category = category;
+            card.dataset.name = filename.toLowerCase();
+
+            const img = document.createElement('img');
+            img.src = `pictures_webp/${category}/${filename}.webp`;
+            img.alt = formatName(filename);
+            img.loading = 'lazy';
+            img.onload = () => img.classList.add('loaded');
+
+            const name = document.createElement('div');
+            name.className = 'name';
+            name.textContent = formatName(filename);
+            name.title = formatName(filename);
+
+            card.appendChild(img);
+            card.appendChild(name);
+
+            card.addEventListener('click', () => openLightbox(category, filename));
+
+            return card;
+        }
+
+        // Initialize gallery
+        function initGallery() {
+            for (const [category, images] of Object.entries(imageData)) {
+                const gallery = document.getElementById(`gallery-${category}`);
+                images.forEach(filename => {
+                    gallery.appendChild(createImageCard(category, filename));
+                });
+            }
+        }
+
+        // Filter functions
+        let currentFilter = 'all';
+        let currentSearch = '';
+
+        function applyFilters() {
+            const cards = document.querySelectorAll('.image-card');
+            const sections = document.querySelectorAll('.category-section');
+            let visibleCount = 0;
+
+            cards.forEach(card => {
+                const matchesFilter = currentFilter === 'all' || card.dataset.category === currentFilter;
+                const matchesSearch = currentSearch === '' || card.dataset.name.includes(currentSearch.toLowerCase());
+                const isVisible = matchesFilter && matchesSearch;
+
+                card.classList.toggle('hidden', !isVisible);
+                if (isVisible) visibleCount++;
+            });
+
+            // Show/hide sections
+            sections.forEach(section => {
+                const category = section.dataset.category;
+                const hasVisibleCards = section.querySelectorAll('.image-card:not(.hidden)').length > 0;
+                const matchesFilter = currentFilter === 'all' || category === currentFilter;
+                section.style.display = (matchesFilter && hasVisibleCards) ? 'block' : 'none';
+            });
+
+            document.getElementById('stats').textContent = `${visibleCount} image${visibleCount > 1 ? 's' : ''} affichée${visibleCount > 1 ? 's' : ''}`;
+        }
+
+        // Filter buttons
+        document.querySelectorAll('.filter-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                currentFilter = btn.dataset.filter;
+                applyFilters();
+            });
+        });
+
+        // Search
+        document.getElementById('search').addEventListener('input', (e) => {
+            currentSearch = e.target.value;
+            applyFilters();
+        });
+
+        // Lightbox
+        function openLightbox(category, filename) {
+            const lightbox = document.getElementById('lightbox');
+            const img = document.getElementById('lightbox-img');
+            const title = document.getElementById('lightbox-title');
+            const cat = document.getElementById('lightbox-category');
+
+            img.src = `pictures_webp/${category}/${filename}.webp`;
+            title.textContent = formatName(filename);
+            cat.textContent = category.replace('-', ' ');
+            lightbox.classList.add('active');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeLightbox() {
+            document.getElementById('lightbox').classList.remove('active');
+            document.body.style.overflow = '';
+        }
+
+        document.getElementById('lightbox-close').addEventListener('click', closeLightbox);
+        document.getElementById('lightbox').addEventListener('click', (e) => {
+            if (e.target.id === 'lightbox') closeLightbox();
+        });
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') closeLightbox();
+        });
+
+        // Initialize
+        initGallery();
+    </script>
+</body>
+</html>
