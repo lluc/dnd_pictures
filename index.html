@@ -101,6 +101,37 @@
             color: #1a1a2e;
         }
 
+        .subcategory-filters {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-bottom: 20px;
+            padding: 10px;
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 10px;
+        }
+
+        .subfilter-btn {
+            padding: 6px 14px;
+            border: 1px solid rgba(201, 162, 39, 0.5);
+            border-radius: 15px;
+            background: transparent;
+            color: #c9a227;
+            font-size: 0.8rem;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-transform: capitalize;
+        }
+
+        .subfilter-btn:hover {
+            background: rgba(201, 162, 39, 0.15);
+        }
+
+        .subfilter-btn.active {
+            background: rgba(201, 162, 39, 0.3);
+            border-color: #c9a227;
+        }
+
         .stats {
             text-align: center;
             padding: 10px;
@@ -274,14 +305,15 @@
                 <input type="search" id="search" placeholder="Rechercher une image...">
             </div>
             <div class="filter-buttons">
-                <button class="filter-btn active" data-filter="all">Tout (1018)</button>
+                <button class="filter-btn active" data-filter="all">Tout (1335)</button>
                 <button class="filter-btn" data-filter="equipment">Equipment (237)</button>
+                <button class="filter-btn" data-filter="feature">Features (317)</button>
                 <button class="filter-btn" data-filter="magic-items">Magic Items (361)</button>
                 <button class="filter-btn" data-filter="monsters">Monsters (334)</button>
                 <button class="filter-btn" data-filter="proficiencies">Proficiencies (86)</button>
             </div>
         </div>
-        <div class="stats" id="stats">1018 images affichées</div>
+        <div class="stats" id="stats">1335 images affichées</div>
     </header>
 
     <main id="gallery-container">
@@ -289,6 +321,13 @@
         <section class="category-section" data-category="equipment">
             <h2 class="category-title">Equipment <span class="count">(237)</span></h2>
             <div class="gallery" id="gallery-equipment"></div>
+        </section>
+
+        <!-- Features (Class Features) -->
+        <section class="category-section" data-category="feature">
+            <h2 class="category-title">Class Features <span class="count">(317)</span></h2>
+            <div class="subcategory-filters" id="feature-subfilters"></div>
+            <div class="gallery" id="gallery-feature"></div>
         </section>
 
         <!-- Magic Items -->
@@ -327,6 +366,22 @@
             "proficiencies": ["alchemist's_supplies","all_armor","battleaxes","blowguns","breastplate","brewer's_supplies","calligrapher's_supplies","carpenter's_tools","cartographer's_tools","chain_mail","chain_shirt","clubs","cobbler's_tools","cook's_utensils","crossbows,_heavy","crossbows,_light","daggers","darts","dice_set","disguise_kit","flails","forgery_kit","glaives","glassblower's_tools","greataxes","greatclubs","greatswords","halberds","half_plate_armor","handaxes","hand_crossbows","heavy_armor","herbalism_kit","hide_armor","javelins","jeweler's_tools","lances","leather_armor","leatherworker's_tools","light_armor","light_hammers","longbows","longswords","lute","lyre","maces","martial_weapons","mason's_tools","mauls","medium_armor","morningstars","navigator's_tools","nets","padded_armor","painter's_supplies","pan_flute","pikes","plate_armor","playing_card_set","poisoner's_kit","potter's_tools","quarterstaffs","rapiers","ring_mail","scale_mail","scimitars","shawm","shields","shortbows","shortswords","sickles","simple_weapons","slings","smith's_tools","spears","splint_armor","studded_leather_armor","thieves'_tools","tinker's_tools","tridents","viol","war_picks","warhammers","weaver's_tools","whips","woodcarver's_tools"]
         };
 
+        // Feature data (class features organized by class)
+        const featureData = {
+            "barbarian": ["ability_score_improvement_(barbarian)","brutal_critical_(1_die)_(barbarian)","brutal_critical_(2_dice)_(barbarian)","brutal_critical_(3_dice)_(barbarian)","danger_sense_(barbarian)","extra_attack_(barbarian)","fast_movement_(barbarian)","feral_instinct_(barbarian)","frenzy_(barbarian)","indomitable_might_(barbarian)","intimidating_presence_(barbarian)","mindless_rage_(barbarian)","path_feature_(barbarian)","persistent_rage_(barbarian)","primal_champion_(barbarian)","primal_path_(barbarian)","rage_(barbarian)","reckless_attack_(barbarian)","relentless_rage_(barbarian)","retaliation_(barbarian)","unarmored_defense_(barbarian)"],
+            "bard": ["ability_score_improvement_(bard)","additional_magical_secrets_(bard)","bard_college_(bard)","bard_college_feature_(bard)","bardic_inspiration_(d10)_(bard)","bardic_inspiration_(d12)_(bard)","bardic_inspiration_(d6)_(bard)","bardic_inspiration_(d8)_(bard)","bonus_proficiencies_(bard)","countercharm_(bard)","cutting_words_(bard)","expertise_(bard)","font_of_inspiration_(bard)","jack_of_all_trades_(bard)","magical_secrets_(bard)","peerless_skill_(bard)","song_of_rest_(d10)_(bard)","song_of_rest_(d12)_(bard)","song_of_rest_(d6)_(bard)","song_of_rest_(d8)_(bard)","spellcasting__bard_(bard)","superior_inspiration_(bard)"],
+            "cleric": ["ability_score_improvement_(cleric)","blessed_healer_(cleric)","bonus_proficiency_(cleric)","channel_divinity_(1_rest)_(cleric)","channel_divinity_(2_rest)_(cleric)","channel_divinity_(3_rest)_(cleric)","channel_divinity__preserve_life_(cleric)","channel_divinity__turn_undead_(cleric)","destroy_undead_(cr_1_2_or_below)_(cleric)","destroy_undead_(cr_1_or_below)_(cleric)","destroy_undead_(cr_2_or_below)_(cleric)","destroy_undead_(cr_3_or_below)_(cleric)","destroy_undead_(cr_4_or_below)_(cleric)","disciple_of_life_(cleric)","divine_domain_(cleric)","divine_domain_feature_(cleric)","divine_intervention_(cleric)","divine_intervention_improvement_(cleric)","divine_strike_(cleric)","domain_spells_(cleric)","spellcasting__cleric_(cleric)","supreme_healing_(cleric)"],
+            "druid": ["ability_score_improvement_(druid)","archdruid_(druid)","beast_spells_(druid)","bonus_cantrip_(druid)","circle_of_the_land__arctic_(druid)","circle_of_the_land__coast_(druid)","circle_of_the_land__desert_(druid)","circle_of_the_land_(druid)","circle_of_the_land__forest_(druid)","circle_of_the_land__grassland_(druid)","circle_of_the_land__mountain_(druid)","circle_of_the_land__swamp_(druid)","circle_spells_(druid)","druid_circle_(druid)","druid_circle_feature_(druid)","druidic_(druid)"],
+            "fighter": ["ability_score_improvement_(fighter)","action_surge_(1_use)_(fighter)","action_surge_(2_uses)_(fighter)","additional_fighting_style_(fighter)","extra_attack_(2)_(fighter)","extra_attack_(3)_(fighter)","extra_attack_(fighter)","fighting_style__archery_(fighter)","fighting_style__defense_(fighter)","fighting_style__dueling_(fighter)","fighting_style_(fighter)","fighting_style__great_weapon_fighting_(fighter)","fighting_style__protection_(fighter)","fighting_style__two-weapon_fighting_(fighter)","improved_critical_(fighter)","indomitable_(1_use)_(fighter)","indomitable_(2_uses)_(fighter)","indomitable_(3_uses)_(fighter)","martial_archetype_feature_(fighter)","martial_archetype_(fighter)","remarkable_athlete_(fighter)","second_wind_(fighter)","superior_critical_(fighter)","survivor_(fighter)"],
+            "monk": ["ability_score_improvement_(monk)","deflect_missiles_(monk)","diamond_soul_(monk)","empty_body_(monk)","evasion_(monk)","extra_attack_(monk)","flurry_of_blows_(monk)","ki_empowered_strikes_(monk)","ki_(monk)","martial_arts_(monk)","monastic_tradition_feature_(monk)","monastic_tradition_(monk)","open_hand_technique_(monk)","patient_defense_(monk)","perfect_self_(monk)","purity_of_body_(monk)","quivering_palm_(monk)","slow_fall_(monk)","step_of_the_wind_(monk)","stillness_of_mind_(monk)","stunning_strike_(monk)","timeless_body_(monk)","tongue_of_the_sun_and_moon_(monk)","tranquility_(monk)","unarmored_defense_(monk)","unarmored_movement_(monk)","wholeness_of_body_(monk)"],
+            "paladin": ["ability_score_improvement_(paladin)","aura_improvements_(paladin)","aura_of_courage_(paladin)","aura_of_devotion_(paladin)","aura_of_protection_(paladin)","channel_divinity_(paladin)","channel_divinity__sacred_weapon_(paladin)","channel_divinity__turn_the_unholy_(paladin)","cleansing_touch_(paladin)","divine_health_(paladin)","divine_sense_(paladin)","divine_smite_(paladin)","extra_attack_(paladin)","fighting_style__defense_(paladin)","fighting_style__dueling_(paladin)","fighting_style__great_weapon_fighting_(paladin)","fighting_style_(paladin)","fighting_style__protection_(paladin)","holy_nimbus_(paladin)","improved_divine_smite_(paladin)","lay_on_hands_(paladin)","oath_spells_(paladin)","purity_of_spirit_(paladin)","sacred_oath_feature_(paladin)","sacred_oath_(paladin)","spellcasting__paladin_(paladin)"],
+            "ranger": ["ability_score_improvement_(ranger)","defensive_tactics__escape_the_horde_(ranger)","defensive_tactics__multiattack_defense_(ranger)","defensive_tactics_(ranger)","defensive_tactics__steel_will_(ranger)","extra_attack_(ranger)","favored_enemy_(1_type)_(ranger)","favored_enemy_(2_types)_(ranger)","favored_enemy_(3_enemies)_(ranger)","feral_senses_(ranger)","fighting_style__archery_(ranger)","fighting_style__defense_(ranger)","fighting_style__dueling_(ranger)","fighting_style_(ranger)","fighting_style__two-weapon_fighting_(ranger)","foe_slayer_(ranger)","hide_in_plain_sight_(ranger)"],
+            "rogue": ["ability_score_improvement_(rogue)","blindsense_(rogue)","cunning_action_(rogue)","elusive_(rogue)","evasion_(rogue)","expertise_(rogue)","fast_hands_(rogue)","reliable_talent_(rogue)","roguish_archetype_feature_(rogue)","roguish_archetype_(rogue)","second-story_work_(rogue)","slippery_mind_(rogue)","sneak_attack_(rogue)","stroke_of_luck_(rogue)","supreme_sneak_(rogue)"],
+            "sorcerer": ["ability_score_improvement_(sorcerer)","draconic_presence_(sorcerer)","draconic_resilience_(sorcerer)","dragon_ancestor__black_-_acid_damage_(sorcerer)","dragon_ancestor__blue_-_lightning_damage_(sorcerer)","dragon_ancestor__brass_-_fire_damage_(sorcerer)","dragon_ancestor__bronze_-_lightning_damage_(sorcerer)","dragon_ancestor__copper_-_acid_damage_(sorcerer)","dragon_ancestor__gold_-_fire_damage_(sorcerer)","dragon_ancestor__green_-_poison_damage_(sorcerer)","dragon_ancestor__red_-_fire_damage_(sorcerer)","dragon_ancestor__silver_-_cold_damage_(sorcerer)","dragon_ancestor_(sorcerer)","dragon_ancestor__white_-_cold_damage_(sorcerer)","dragon_wings_(sorcerer)","elemental_affinity_(sorcerer)","flexible_casting__converting_spell_slot_(sorcerer)","flexible_casting__creating_spell_slots_(sorcerer)","font_of_magic_(sorcerer)","metamagic__careful_spell_(sorcerer)","metamagic__distant_spell_(sorcerer)","metamagic__empowered_spell_(sorcerer)","metamagic__extended_spell_(sorcerer)","metamagic__heightened_spell_(sorcerer)","metamagic__quickened_spell_(sorcerer)","metamagic_(sorcerer)","metamagic__subtle_spell_(sorcerer)","metamagic__twinned_spell_(sorcerer)","sorcerous_origin_feature_(sorcerer)","sorcerous_origin_(sorcerer)","sorcerous_restoration_(sorcerer)","spellcasting__sorcerer_(sorcerer)"],
+            "warlock": ["ability_score_improvement_(warlock)"],
+            "wizard": ["ability_score_improvement_(wizard)","arcane_recovery_(wizard)","arcane_tradition_feature_(wizard)","arcane_tradition_(wizard)","empowered_evocation_(wizard)","evocation_savant_(wizard)","overchannel_(wizard)","potent_cantrip_(wizard)","sculpt_spells_(wizard)","signature_spell_(wizard)","spellcasting__wizard_(wizard)","spell_mastery_(wizard)"]
+        };
+
         // Format name for display
         function formatName(filename) {
             return filename
@@ -341,14 +396,21 @@
         }
 
         // Create image card
-        function createImageCard(category, filename) {
+        function createImageCard(category, filename, subCategory = null) {
             const card = document.createElement('div');
             card.className = 'image-card';
             card.dataset.category = category;
             card.dataset.name = filename.toLowerCase();
+            if (subCategory) {
+                card.dataset.subCategory = subCategory;
+            }
 
             const img = document.createElement('img');
-            img.src = `pictures_webp/${category}/${filename}.webp`;
+            // Handle nested feature paths
+            const imgPath = subCategory
+                ? `pictures_webp/${category}/${subCategory}/${filename}.webp`
+                : `pictures_webp/${category}/${filename}.webp`;
+            img.src = imgPath;
             img.alt = formatName(filename);
             img.loading = 'lazy';
             img.onload = () => img.classList.add('loaded');
@@ -361,24 +423,62 @@
             card.appendChild(img);
             card.appendChild(name);
 
-            card.addEventListener('click', () => openLightbox(category, filename));
+            card.addEventListener('click', () => openLightbox(category, filename, subCategory));
 
             return card;
         }
 
         // Initialize gallery
         function initGallery() {
+            // Regular categories
             for (const [category, images] of Object.entries(imageData)) {
                 const gallery = document.getElementById(`gallery-${category}`);
                 images.forEach(filename => {
                     gallery.appendChild(createImageCard(category, filename));
                 });
             }
+
+            // Feature category with subfolders
+            const featureGallery = document.getElementById('gallery-feature');
+            const subfiltersContainer = document.getElementById('feature-subfilters');
+
+            // Add "All" button for features
+            const allBtn = document.createElement('button');
+            allBtn.className = 'subfilter-btn active';
+            allBtn.dataset.subfilter = 'all';
+            allBtn.textContent = 'All Classes';
+            subfiltersContainer.appendChild(allBtn);
+
+            // Add buttons and images for each class
+            for (const [className, features] of Object.entries(featureData)) {
+                // Add subfilter button
+                const btn = document.createElement('button');
+                btn.className = 'subfilter-btn';
+                btn.dataset.subfilter = className;
+                btn.textContent = `${className} (${features.length})`;
+                subfiltersContainer.appendChild(btn);
+
+                // Add images
+                features.forEach(filename => {
+                    featureGallery.appendChild(createImageCard('feature', filename, className));
+                });
+            }
+
+            // Setup subfilter click handlers
+            subfiltersContainer.querySelectorAll('.subfilter-btn').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    subfiltersContainer.querySelectorAll('.subfilter-btn').forEach(b => b.classList.remove('active'));
+                    btn.classList.add('active');
+                    currentSubFilter = btn.dataset.subfilter;
+                    applyFilters();
+                });
+            });
         }
 
         // Filter functions
         let currentFilter = 'all';
         let currentSearch = '';
+        let currentSubFilter = 'all';
 
         function applyFilters() {
             const cards = document.querySelectorAll('.image-card');
@@ -388,7 +488,14 @@
             cards.forEach(card => {
                 const matchesFilter = currentFilter === 'all' || card.dataset.category === currentFilter;
                 const matchesSearch = currentSearch === '' || card.dataset.name.includes(currentSearch.toLowerCase());
-                const isVisible = matchesFilter && matchesSearch;
+
+                // Handle subfilter for features
+                let matchesSubFilter = true;
+                if (card.dataset.category === 'feature' && currentSubFilter !== 'all') {
+                    matchesSubFilter = card.dataset.subCategory === currentSubFilter;
+                }
+
+                const isVisible = matchesFilter && matchesSearch && matchesSubFilter;
 
                 card.classList.toggle('hidden', !isVisible);
                 if (isVisible) visibleCount++;
@@ -401,6 +508,10 @@
                 const matchesFilter = currentFilter === 'all' || category === currentFilter;
                 section.style.display = (matchesFilter && hasVisibleCards) ? 'block' : 'none';
             });
+
+            // Show/hide subfilters container
+            const subfiltersContainer = document.getElementById('feature-subfilters');
+            subfiltersContainer.style.display = (currentFilter === 'all' || currentFilter === 'feature') ? 'flex' : 'none';
 
             document.getElementById('stats').textContent = `${visibleCount} image${visibleCount > 1 ? 's' : ''} affichée${visibleCount > 1 ? 's' : ''}`;
         }
@@ -422,15 +533,20 @@
         });
 
         // Lightbox
-        function openLightbox(category, filename) {
+        function openLightbox(category, filename, subCategory = null) {
             const lightbox = document.getElementById('lightbox');
             const img = document.getElementById('lightbox-img');
             const title = document.getElementById('lightbox-title');
             const cat = document.getElementById('lightbox-category');
 
-            img.src = `pictures_webp/${category}/${filename}.webp`;
+            const imgPath = subCategory
+                ? `pictures_webp/${category}/${subCategory}/${filename}.webp`
+                : `pictures_webp/${category}/${filename}.webp`;
+            img.src = imgPath;
             title.textContent = formatName(filename);
-            cat.textContent = category.replace('-', ' ');
+            cat.textContent = subCategory
+                ? `${category} / ${subCategory}`
+                : category.replace('-', ' ');
             lightbox.classList.add('active');
             document.body.style.overflow = 'hidden';
         }
