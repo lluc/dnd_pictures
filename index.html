@@ -413,16 +413,17 @@
                 <input type="search" id="search" placeholder="Rechercher une image...">
             </div>
             <div class="filter-buttons">
-                <button class="filter-btn active" data-filter="all">Tout (1654)</button>
+                <button class="filter-btn active" data-filter="all">Tout (1672)</button>
                 <button class="filter-btn" data-filter="equipment">Equipment (237)</button>
                 <button class="filter-btn" data-filter="feature">Features (317)</button>
                 <button class="filter-btn" data-filter="magic-items">Magic Items (361)</button>
                 <button class="filter-btn" data-filter="monsters">Monsters (334)</button>
                 <button class="filter-btn" data-filter="proficiencies">Proficiencies (86)</button>
+                <button class="filter-btn" data-filter="skill">Skills (18)</button>
                 <button class="filter-btn" data-filter="spell">Spells (319)</button>
             </div>
         </div>
-        <div class="stats" id="stats">1654 images affichées</div>
+        <div class="stats" id="stats">1672 images affichées</div>
     </header>
 
     <main id="gallery-container">
@@ -455,6 +456,13 @@
         <section class="category-section" data-category="proficiencies">
             <h2 class="category-title">Proficiencies <span class="count">(86)</span></h2>
             <div class="gallery" id="gallery-proficiencies"></div>
+        </section>
+
+        <!-- Skills -->
+        <section class="category-section" data-category="skill">
+            <h2 class="category-title">Skills <span class="count">(18)</span></h2>
+            <div class="subcategory-filters" id="skill-subfilters"></div>
+            <div class="gallery" id="gallery-skill"></div>
         </section>
 
         <!-- Spells -->
@@ -496,6 +504,15 @@
             "sorcerer": ["ability_score_improvement_(sorcerer)","draconic_presence_(sorcerer)","draconic_resilience_(sorcerer)","dragon_ancestor__black_-_acid_damage_(sorcerer)","dragon_ancestor__blue_-_lightning_damage_(sorcerer)","dragon_ancestor__brass_-_fire_damage_(sorcerer)","dragon_ancestor__bronze_-_lightning_damage_(sorcerer)","dragon_ancestor__copper_-_acid_damage_(sorcerer)","dragon_ancestor__gold_-_fire_damage_(sorcerer)","dragon_ancestor__green_-_poison_damage_(sorcerer)","dragon_ancestor__red_-_fire_damage_(sorcerer)","dragon_ancestor__silver_-_cold_damage_(sorcerer)","dragon_ancestor_(sorcerer)","dragon_ancestor__white_-_cold_damage_(sorcerer)","dragon_wings_(sorcerer)","elemental_affinity_(sorcerer)","flexible_casting__converting_spell_slot_(sorcerer)","flexible_casting__creating_spell_slots_(sorcerer)","font_of_magic_(sorcerer)","metamagic__careful_spell_(sorcerer)","metamagic__distant_spell_(sorcerer)","metamagic__empowered_spell_(sorcerer)","metamagic__extended_spell_(sorcerer)","metamagic__heightened_spell_(sorcerer)","metamagic__quickened_spell_(sorcerer)","metamagic_(sorcerer)","metamagic__subtle_spell_(sorcerer)","metamagic__twinned_spell_(sorcerer)","sorcerous_origin_feature_(sorcerer)","sorcerous_origin_(sorcerer)","sorcerous_restoration_(sorcerer)","spellcasting__sorcerer_(sorcerer)"],
             "warlock": ["ability_score_improvement_(warlock)"],
             "wizard": ["ability_score_improvement_(wizard)","arcane_recovery_(wizard)","arcane_tradition_feature_(wizard)","arcane_tradition_(wizard)","empowered_evocation_(wizard)","evocation_savant_(wizard)","overchannel_(wizard)","potent_cantrip_(wizard)","sculpt_spells_(wizard)","signature_spell_(wizard)","spellcasting__wizard_(wizard)","spell_mastery_(wizard)"]
+        };
+
+        // Skill data (skills organized by ability score)
+        const skillData = {
+            "charisme": ["deception","intimidation","performance","persuasion"],
+            "dexterite": ["acrobatics","sleight_of_hand","stealth"],
+            "force": ["athletics"],
+            "intelligence": ["arcana","history","investigation","nature","religion"],
+            "sagesse": ["animal_handling","insight","medicine","perception","survival"]
         };
 
         // Spell data (spells organized by school of magic)
@@ -602,6 +619,42 @@
                 });
             });
 
+            // Skill category with subfolders (ability scores)
+            const skillGallery = document.getElementById('gallery-skill');
+            const skillSubfiltersContainer = document.getElementById('skill-subfilters');
+
+            // Add "All" button for skills
+            const allSkillBtn = document.createElement('button');
+            allSkillBtn.className = 'subfilter-btn active';
+            allSkillBtn.dataset.subfilter = 'all';
+            allSkillBtn.textContent = 'All Abilities';
+            skillSubfiltersContainer.appendChild(allSkillBtn);
+
+            // Add buttons and images for each ability
+            for (const [abilityName, skills] of Object.entries(skillData)) {
+                // Add subfilter button
+                const btn = document.createElement('button');
+                btn.className = 'subfilter-btn';
+                btn.dataset.subfilter = abilityName;
+                btn.textContent = `${abilityName} (${skills.length})`;
+                skillSubfiltersContainer.appendChild(btn);
+
+                // Add images
+                skills.forEach(filename => {
+                    skillGallery.appendChild(createImageCard('skill', filename, abilityName));
+                });
+            }
+
+            // Setup subfilter click handlers for skills
+            skillSubfiltersContainer.querySelectorAll('.subfilter-btn').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    skillSubfiltersContainer.querySelectorAll('.subfilter-btn').forEach(b => b.classList.remove('active'));
+                    btn.classList.add('active');
+                    currentSkillSubFilter = btn.dataset.subfilter;
+                    applyFilters();
+                });
+            });
+
             // Spell category with subfolders (schools of magic)
             const spellGallery = document.getElementById('gallery-spell');
             const spellSubfiltersContainer = document.getElementById('spell-subfilters');
@@ -643,6 +696,7 @@
         let currentFilter = 'all';
         let currentSearch = '';
         let currentSubFilter = 'all';
+        let currentSkillSubFilter = 'all';
         let currentSpellSubFilter = 'all';
 
         function applyFilters() {
@@ -658,6 +712,10 @@
                 let matchesSubFilter = true;
                 if (card.dataset.category === 'feature' && currentSubFilter !== 'all') {
                     matchesSubFilter = card.dataset.subCategory === currentSubFilter;
+                }
+                // Handle subfilter for skills
+                if (card.dataset.category === 'skill' && currentSkillSubFilter !== 'all') {
+                    matchesSubFilter = card.dataset.subCategory === currentSkillSubFilter;
                 }
                 // Handle subfilter for spells
                 if (card.dataset.category === 'spell' && currentSpellSubFilter !== 'all') {
@@ -681,6 +739,9 @@
             // Show/hide subfilters containers
             const featureSubfiltersContainer = document.getElementById('feature-subfilters');
             featureSubfiltersContainer.style.display = (currentFilter === 'all' || currentFilter === 'feature') ? 'flex' : 'none';
+
+            const skillSubfiltersContainer = document.getElementById('skill-subfilters');
+            skillSubfiltersContainer.style.display = (currentFilter === 'all' || currentFilter === 'skill') ? 'flex' : 'none';
 
             const spellSubfiltersContainer = document.getElementById('spell-subfilters');
             spellSubfiltersContainer.style.display = (currentFilter === 'all' || currentFilter === 'spell') ? 'flex' : 'none';
