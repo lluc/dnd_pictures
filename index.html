@@ -413,7 +413,7 @@
                 <input type="search" id="search" placeholder="Rechercher une image...">
             </div>
             <div class="filter-buttons">
-                <button class="filter-btn active" data-filter="all">Tout (1709)</button>
+                <button class="filter-btn active" data-filter="all">Tout (1718)</button>
                 <button class="filter-btn" data-filter="equipment">Equipment (237)</button>
                 <button class="filter-btn" data-filter="feature">Features (317)</button>
                 <button class="filter-btn" data-filter="magic-items">Magic Items (361)</button>
@@ -422,9 +422,10 @@
                 <button class="filter-btn" data-filter="skill">Skills (18)</button>
                 <button class="filter-btn" data-filter="trait">Traits (37)</button>
                 <button class="filter-btn" data-filter="spell">Spells (319)</button>
+                <button class="filter-btn" data-filter="race">Races (9)</button>
             </div>
         </div>
-        <div class="stats" id="stats">1709 images affichées</div>
+        <div class="stats" id="stats">1718 images affichées</div>
     </header>
 
     <main id="gallery-container">
@@ -479,6 +480,13 @@
             <div class="subcategory-filters" id="spell-subfilters"></div>
             <div class="gallery" id="gallery-spell"></div>
         </section>
+
+        <!-- Races -->
+        <section class="category-section" data-category="race">
+            <h2 class="category-title">Races <span class="count">(9)</span></h2>
+            <div class="subcategory-filters" id="race-subfilters"></div>
+            <div class="gallery" id="gallery-race"></div>
+        </section>
     </main>
 
     <!-- Lightbox -->
@@ -521,6 +529,12 @@
             "force": ["athletics"],
             "intelligence": ["arcana","history","investigation","nature","religion"],
             "sagesse": ["animal_handling","insight","medicine","perception","survival"]
+        };
+
+        // Race data (races organized by size)
+        const raceData = {
+            "moyennes": ["dragonborn","dwarf","elf","half-elf","half-orc","human","tiefling"],
+            "petites": ["gnome","halfling"]
         };
 
         // Trait data (racial traits organized by race)
@@ -747,6 +761,42 @@
                     applyFilters();
                 });
             });
+
+            // Race category with subfolders (size)
+            const raceGallery = document.getElementById('gallery-race');
+            const raceSubfiltersContainer = document.getElementById('race-subfilters');
+
+            // Add "All" button for races
+            const allRaceBtn = document.createElement('button');
+            allRaceBtn.className = 'subfilter-btn active';
+            allRaceBtn.dataset.subfilter = 'all';
+            allRaceBtn.textContent = 'All Sizes';
+            raceSubfiltersContainer.appendChild(allRaceBtn);
+
+            // Add buttons and images for each size
+            for (const [sizeName, races] of Object.entries(raceData)) {
+                // Add subfilter button
+                const btn = document.createElement('button');
+                btn.className = 'subfilter-btn';
+                btn.dataset.subfilter = sizeName;
+                btn.textContent = `${sizeName} (${races.length})`;
+                raceSubfiltersContainer.appendChild(btn);
+
+                // Add images
+                races.forEach(filename => {
+                    raceGallery.appendChild(createImageCard('race', filename, sizeName));
+                });
+            }
+
+            // Setup subfilter click handlers for races
+            raceSubfiltersContainer.querySelectorAll('.subfilter-btn').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    raceSubfiltersContainer.querySelectorAll('.subfilter-btn').forEach(b => b.classList.remove('active'));
+                    btn.classList.add('active');
+                    currentRaceSubFilter = btn.dataset.subfilter;
+                    applyFilters();
+                });
+            });
         }
 
         // Filter functions
@@ -756,6 +806,7 @@
         let currentSkillSubFilter = 'all';
         let currentTraitSubFilter = 'all';
         let currentSpellSubFilter = 'all';
+        let currentRaceSubFilter = 'all';
 
         function applyFilters() {
             const cards = document.querySelectorAll('.image-card');
@@ -782,6 +833,10 @@
                 // Handle subfilter for spells
                 if (card.dataset.category === 'spell' && currentSpellSubFilter !== 'all') {
                     matchesSubFilter = card.dataset.subCategory === currentSpellSubFilter;
+                }
+                // Handle subfilter for races
+                if (card.dataset.category === 'race' && currentRaceSubFilter !== 'all') {
+                    matchesSubFilter = card.dataset.subCategory === currentRaceSubFilter;
                 }
 
                 const isVisible = matchesFilter && matchesSearch && matchesSubFilter;
@@ -810,6 +865,9 @@
 
             const spellSubfiltersContainer = document.getElementById('spell-subfilters');
             spellSubfiltersContainer.style.display = (currentFilter === 'all' || currentFilter === 'spell') ? 'flex' : 'none';
+
+            const raceSubfiltersContainer = document.getElementById('race-subfilters');
+            raceSubfiltersContainer.style.display = (currentFilter === 'all' || currentFilter === 'race') ? 'flex' : 'none';
 
             document.getElementById('stats').textContent = `${visibleCount} image${visibleCount > 1 ? 's' : ''} affichée${visibleCount > 1 ? 's' : ''}`;
         }
