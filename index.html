@@ -139,6 +139,14 @@
             font-size: 0.9rem;
         }
 
+        .mobile-header {
+            display: none;
+        }
+
+        .menu-toggle {
+            display: none;
+        }
+
         main {
             padding: 20px;
             max-width: 1600px;
@@ -267,8 +275,101 @@
 
         /* Responsive */
         @media (max-width: 768px) {
-            h1 {
-                font-size: 1.8rem;
+            header {
+                padding: 10px 15px;
+            }
+
+            .mobile-header {
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                gap: 10px;
+                margin-bottom: 10px;
+            }
+
+            .mobile-header h1 {
+                font-size: 1.3rem;
+                margin-bottom: 0;
+            }
+
+            .menu-toggle {
+                display: block;
+                background: none;
+                border: 2px solid #c9a227;
+                color: #c9a227;
+                font-size: 1.5rem;
+                padding: 5px 12px;
+                border-radius: 8px;
+                cursor: pointer;
+                transition: all 0.3s;
+            }
+
+            .menu-toggle:hover {
+                background: rgba(201, 162, 39, 0.2);
+            }
+
+            .menu-toggle.open {
+                background: rgba(201, 162, 39, 0.3);
+            }
+
+            header > h1 {
+                display: none;
+            }
+
+            .controls {
+                display: none;
+                flex-direction: column;
+                padding-top: 10px;
+                border-top: 1px solid rgba(201, 162, 39, 0.3);
+            }
+
+            .controls.open {
+                display: flex;
+            }
+
+            .search-box {
+                min-width: unset;
+                max-width: 100%;
+                width: 100%;
+                margin-bottom: 10px;
+            }
+
+            .search-box input {
+                padding: 10px 15px;
+            }
+
+            .filter-buttons {
+                display: grid;
+                grid-template-columns: repeat(3, 1fr);
+                gap: 8px;
+                width: 100%;
+            }
+
+            .filter-btn {
+                padding: 8px 5px;
+                font-size: 0.7rem;
+                text-align: center;
+            }
+
+            .subcategory-filters {
+                overflow-x: auto;
+                flex-wrap: nowrap;
+                padding: 8px;
+                margin: 10px -15px 0;
+                -webkit-overflow-scrolling: touch;
+                scrollbar-width: thin;
+            }
+
+            .subfilter-btn {
+                flex-shrink: 0;
+                padding: 5px 12px;
+                font-size: 0.7rem;
+                white-space: nowrap;
+            }
+
+            .stats {
+                font-size: 0.8rem;
+                padding: 5px;
             }
 
             .gallery {
@@ -280,9 +381,12 @@
                 height: 140px;
             }
 
-            .filter-btn {
-                padding: 8px 15px;
-                font-size: 0.8rem;
+            main {
+                padding: 15px;
+            }
+
+            .category-title {
+                font-size: 1.3rem;
             }
         }
 
@@ -299,21 +403,26 @@
 </head>
 <body>
     <header>
+        <div class="mobile-header">
+            <h1>D&D 5e Gallery</h1>
+            <button class="menu-toggle" id="menu-toggle" aria-label="Toggle filters">☰</button>
+        </div>
         <h1>D&D 5e Image Collection</h1>
         <div class="controls">
             <div class="search-box">
                 <input type="search" id="search" placeholder="Rechercher une image...">
             </div>
             <div class="filter-buttons">
-                <button class="filter-btn active" data-filter="all">Tout (1335)</button>
+                <button class="filter-btn active" data-filter="all">Tout (1654)</button>
                 <button class="filter-btn" data-filter="equipment">Equipment (237)</button>
                 <button class="filter-btn" data-filter="feature">Features (317)</button>
                 <button class="filter-btn" data-filter="magic-items">Magic Items (361)</button>
                 <button class="filter-btn" data-filter="monsters">Monsters (334)</button>
                 <button class="filter-btn" data-filter="proficiencies">Proficiencies (86)</button>
+                <button class="filter-btn" data-filter="spell">Spells (319)</button>
             </div>
         </div>
-        <div class="stats" id="stats">1335 images affichées</div>
+        <div class="stats" id="stats">1654 images affichées</div>
     </header>
 
     <main id="gallery-container">
@@ -346,6 +455,13 @@
         <section class="category-section" data-category="proficiencies">
             <h2 class="category-title">Proficiencies <span class="count">(86)</span></h2>
             <div class="gallery" id="gallery-proficiencies"></div>
+        </section>
+
+        <!-- Spells -->
+        <section class="category-section" data-category="spell">
+            <h2 class="category-title">Spells <span class="count">(319)</span></h2>
+            <div class="subcategory-filters" id="spell-subfilters"></div>
+            <div class="gallery" id="gallery-spell"></div>
         </section>
     </main>
 
@@ -380,6 +496,18 @@
             "sorcerer": ["ability_score_improvement_(sorcerer)","draconic_presence_(sorcerer)","draconic_resilience_(sorcerer)","dragon_ancestor__black_-_acid_damage_(sorcerer)","dragon_ancestor__blue_-_lightning_damage_(sorcerer)","dragon_ancestor__brass_-_fire_damage_(sorcerer)","dragon_ancestor__bronze_-_lightning_damage_(sorcerer)","dragon_ancestor__copper_-_acid_damage_(sorcerer)","dragon_ancestor__gold_-_fire_damage_(sorcerer)","dragon_ancestor__green_-_poison_damage_(sorcerer)","dragon_ancestor__red_-_fire_damage_(sorcerer)","dragon_ancestor__silver_-_cold_damage_(sorcerer)","dragon_ancestor_(sorcerer)","dragon_ancestor__white_-_cold_damage_(sorcerer)","dragon_wings_(sorcerer)","elemental_affinity_(sorcerer)","flexible_casting__converting_spell_slot_(sorcerer)","flexible_casting__creating_spell_slots_(sorcerer)","font_of_magic_(sorcerer)","metamagic__careful_spell_(sorcerer)","metamagic__distant_spell_(sorcerer)","metamagic__empowered_spell_(sorcerer)","metamagic__extended_spell_(sorcerer)","metamagic__heightened_spell_(sorcerer)","metamagic__quickened_spell_(sorcerer)","metamagic_(sorcerer)","metamagic__subtle_spell_(sorcerer)","metamagic__twinned_spell_(sorcerer)","sorcerous_origin_feature_(sorcerer)","sorcerous_origin_(sorcerer)","sorcerous_restoration_(sorcerer)","spellcasting__sorcerer_(sorcerer)"],
             "warlock": ["ability_score_improvement_(warlock)"],
             "wizard": ["ability_score_improvement_(wizard)","arcane_recovery_(wizard)","arcane_tradition_feature_(wizard)","arcane_tradition_(wizard)","empowered_evocation_(wizard)","evocation_savant_(wizard)","overchannel_(wizard)","potent_cantrip_(wizard)","sculpt_spells_(wizard)","signature_spell_(wizard)","spellcasting__wizard_(wizard)","spell_mastery_(wizard)"]
+        };
+
+        // Spell data (spells organized by school of magic)
+        const spellData = {
+            "abjuration": ["aid","alarm","antilife_shell","antimagic_field","arcane_lock","banishment","beacon_of_hope","counterspell","death_ward","dispel_evil_and_good","dispel_magic","forbiddance","freedom_of_movement","globe_of_invulnerability","glyph_of_warding","greater_restoration","guards_and_wards","holy_aura","imprisonment","lesser_restoration","mage_armor","magic_circle","mind_blank","nondetection","pass_without_trace","planar_binding","prismatic_wall","private_sanctum","protection_from_energy","protection_from_evil_and_good","protection_from_poison","remove_curse","resistance","sanctuary","shield_of_faith","shield","stoneskin","symbol","warding_bond"],
+            "conjuration": ["acid_splash","black_tentacles","call_lightning","cloudkill","conjure_animals","conjure_celestial","conjure_elemental","conjure_fey","conjure_minor_elementals","conjure_woodland_beings","create_food_and_water","demiplane","dimension_door","entangle","faithful_hound","find_familiar","find_steed","flaming_sphere","floating_disk","fog_cloud","gate","grease","guardian_of_faith","heroes'_feast","incendiary_cloud","insect_plague","instant_summons","mage_hand","magnificent_mansion","mass_cure_wounds","mass_heal","maze","misty_step","planar_ally","plane_shift","poison_spray","produce_flame","revivify","secret_chest","sleet_storm","spirit_guardians","stinking_cloud","storm_of_vengeance","teleportation_circle","teleport","transport_via_plants","tree_stride","unseen_servant","wall_of_thorns","web","wish","word_of_recall"],
+            "divination": ["arcane_eye","augury","clairvoyance","commune","commune_with_nature","comprehend_languages","contact_other_plane","detect_evil_and_good","detect_magic","detect_poison_and_disease","detect_thoughts","divination","find_the_path","find_traps","foresight","guidance","hunter's_mark","identify","legend_lore","locate_animals_or_plants","locate_creature","locate_object","scrying","see_invisibility","speak_with_animals","telepathic_bond","tongues","true_seeing","true_strike"],
+            "enchantment": ["animal_friendship","animal_messenger","antipathy_sympathy","bane","bless","calm_emotions","charm_person","command","compulsion","confusion","dominate_beast","dominate_monster","dominate_person","enthrall","feeblemind","geas","heroism","hideous_laughter","hold_monster","hold_person","irresistible_dance","mass_suggestion","modify_memory","power_word_kill","power_word_stun","sleep","suggestion","vicious_mockery","zone_of_truth"],
+            "evocation": ["acid_arrow","arcane_hand","arcane_sword","blade_barrier","branding_smite","burning_hands","chain_lightning","cone_of_cold","contingency","continual_flame","cure_wounds","dancing_lights","darkness","daylight","delayed_blast_fireball","divine_favor","divine_word","earthquake","eldritch_blast","faerie_fire","fireball","fire_bolt","fire_shield","fire_storm","flame_blade","flame_strike","forcecage","freezing_sphere","guiding_bolt","gust_of_wind","hallow","healing_word","heal","hellish_rebuke","ice_storm","lightning_bolt","light","magic_missile","mass_healing_word","meteor_swarm","moonbeam","prayer_of_healing","prismatic_spray","ray_of_frost","resilient_sphere","sacred_flame","scorching_ray","sending","shatter","shocking_grasp","spiritual_weapon","sunbeam","sunburst","thunderwave","tiny_hut","wall_of_fire","wall_of_force","wall_of_ice","wall_of_stone","wind_wall"],
+            "illusion": ["arcanist's_magic_aura","blur","color_spray","creation","disguise_self","dream","fear","greater_invisibility","hallucinatory_terrain","hypnotic_pattern","illusory_script","invisibility","magic_mouth","major_image","minor_illusion","mirage_arcane","mirror_image","mislead","phantasmal_killer","phantom_steed","programmed_illusion","project_image","seeming","silence","silent_image","simulacrum","weird"],
+            "necromancy": ["animate_dead","astral_projection","bestow_curse","blight","blindness_deafness","chill_touch","circle_of_death","clone","contagion","create_undead","eyebite","false_life","finger_of_death","gentle_repose","harm","inflict_wounds","magic_jar","raise_dead","ray_of_enfeeblement","resurrection","spare_the_dying","speak_with_dead","true_resurrection","vampiric_touch"],
+            "transmutation": ["alter_self","animal_shapes","animate_objects","awaken","barkskin","blink","control_water","control_weather","create_or_destroy_water","darkvision","disintegrate","druidcraft","enhance_ability","enlarge_reduce","etherealness","expeditious_retreat","fabricate","feather_fall","flesh_to_stone","fly","gaseous_form","giant_insect","glibness","goodberry","haste","heat_metal","jump","knock","levitate","longstrider","magic_weapon","meld_into_stone","mending","message","move_earth","passwall","plant_growth","polymorph","prestidigitation","purify_food_and_drink","regenerate","reincarnate","reverse_gravity","rope_trick","sequester","shapechange","shillelagh","slow","speak_with_plants","spider_climb","spike_growth","stone_shape","telekinesis","thaumaturgy","time_stop","true_polymorph","water_breathing","water_walk","wind_walk"]
         };
 
         // Format name for display
@@ -464,12 +592,48 @@
                 });
             }
 
-            // Setup subfilter click handlers
+            // Setup subfilter click handlers for features
             subfiltersContainer.querySelectorAll('.subfilter-btn').forEach(btn => {
                 btn.addEventListener('click', () => {
                     subfiltersContainer.querySelectorAll('.subfilter-btn').forEach(b => b.classList.remove('active'));
                     btn.classList.add('active');
                     currentSubFilter = btn.dataset.subfilter;
+                    applyFilters();
+                });
+            });
+
+            // Spell category with subfolders (schools of magic)
+            const spellGallery = document.getElementById('gallery-spell');
+            const spellSubfiltersContainer = document.getElementById('spell-subfilters');
+
+            // Add "All" button for spells
+            const allSpellBtn = document.createElement('button');
+            allSpellBtn.className = 'subfilter-btn active';
+            allSpellBtn.dataset.subfilter = 'all';
+            allSpellBtn.textContent = 'All Schools';
+            spellSubfiltersContainer.appendChild(allSpellBtn);
+
+            // Add buttons and images for each school
+            for (const [schoolName, spells] of Object.entries(spellData)) {
+                // Add subfilter button
+                const btn = document.createElement('button');
+                btn.className = 'subfilter-btn';
+                btn.dataset.subfilter = schoolName;
+                btn.textContent = `${schoolName} (${spells.length})`;
+                spellSubfiltersContainer.appendChild(btn);
+
+                // Add images
+                spells.forEach(filename => {
+                    spellGallery.appendChild(createImageCard('spell', filename, schoolName));
+                });
+            }
+
+            // Setup subfilter click handlers for spells
+            spellSubfiltersContainer.querySelectorAll('.subfilter-btn').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    spellSubfiltersContainer.querySelectorAll('.subfilter-btn').forEach(b => b.classList.remove('active'));
+                    btn.classList.add('active');
+                    currentSpellSubFilter = btn.dataset.subfilter;
                     applyFilters();
                 });
             });
@@ -479,6 +643,7 @@
         let currentFilter = 'all';
         let currentSearch = '';
         let currentSubFilter = 'all';
+        let currentSpellSubFilter = 'all';
 
         function applyFilters() {
             const cards = document.querySelectorAll('.image-card');
@@ -493,6 +658,10 @@
                 let matchesSubFilter = true;
                 if (card.dataset.category === 'feature' && currentSubFilter !== 'all') {
                     matchesSubFilter = card.dataset.subCategory === currentSubFilter;
+                }
+                // Handle subfilter for spells
+                if (card.dataset.category === 'spell' && currentSpellSubFilter !== 'all') {
+                    matchesSubFilter = card.dataset.subCategory === currentSpellSubFilter;
                 }
 
                 const isVisible = matchesFilter && matchesSearch && matchesSubFilter;
@@ -509,9 +678,12 @@
                 section.style.display = (matchesFilter && hasVisibleCards) ? 'block' : 'none';
             });
 
-            // Show/hide subfilters container
-            const subfiltersContainer = document.getElementById('feature-subfilters');
-            subfiltersContainer.style.display = (currentFilter === 'all' || currentFilter === 'feature') ? 'flex' : 'none';
+            // Show/hide subfilters containers
+            const featureSubfiltersContainer = document.getElementById('feature-subfilters');
+            featureSubfiltersContainer.style.display = (currentFilter === 'all' || currentFilter === 'feature') ? 'flex' : 'none';
+
+            const spellSubfiltersContainer = document.getElementById('spell-subfilters');
+            spellSubfiltersContainer.style.display = (currentFilter === 'all' || currentFilter === 'spell') ? 'flex' : 'none';
 
             document.getElementById('stats').textContent = `${visibleCount} image${visibleCount > 1 ? 's' : ''} affichée${visibleCount > 1 ? 's' : ''}`;
         }
@@ -562,6 +734,14 @@
         });
         document.addEventListener('keydown', (e) => {
             if (e.key === 'Escape') closeLightbox();
+        });
+
+        // Toggle mobile filters
+        document.getElementById('menu-toggle').addEventListener('click', function() {
+            const controls = document.querySelector('.controls');
+            controls.classList.toggle('open');
+            this.classList.toggle('open');
+            this.textContent = controls.classList.contains('open') ? '✕' : '☰';
         });
 
         // Initialize
