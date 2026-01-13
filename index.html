@@ -413,17 +413,18 @@
                 <input type="search" id="search" placeholder="Rechercher une image...">
             </div>
             <div class="filter-buttons">
-                <button class="filter-btn active" data-filter="all">Tout (1672)</button>
+                <button class="filter-btn active" data-filter="all">Tout (1709)</button>
                 <button class="filter-btn" data-filter="equipment">Equipment (237)</button>
                 <button class="filter-btn" data-filter="feature">Features (317)</button>
                 <button class="filter-btn" data-filter="magic-items">Magic Items (361)</button>
                 <button class="filter-btn" data-filter="monsters">Monsters (334)</button>
                 <button class="filter-btn" data-filter="proficiencies">Proficiencies (86)</button>
                 <button class="filter-btn" data-filter="skill">Skills (18)</button>
+                <button class="filter-btn" data-filter="trait">Traits (37)</button>
                 <button class="filter-btn" data-filter="spell">Spells (319)</button>
             </div>
         </div>
-        <div class="stats" id="stats">1672 images affichées</div>
+        <div class="stats" id="stats">1709 images affichées</div>
     </header>
 
     <main id="gallery-container">
@@ -463,6 +464,13 @@
             <h2 class="category-title">Skills <span class="count">(18)</span></h2>
             <div class="subcategory-filters" id="skill-subfilters"></div>
             <div class="gallery" id="gallery-skill"></div>
+        </section>
+
+        <!-- Traits -->
+        <section class="category-section" data-category="trait">
+            <h2 class="category-title">Racial Traits <span class="count">(37)</span></h2>
+            <div class="subcategory-filters" id="trait-subfilters"></div>
+            <div class="gallery" id="gallery-trait"></div>
         </section>
 
         <!-- Spells -->
@@ -513,6 +521,19 @@
             "force": ["athletics"],
             "intelligence": ["arcana","history","investigation","nature","religion"],
             "sagesse": ["animal_handling","insight","medicine","perception","survival"]
+        };
+
+        // Trait data (racial traits organized by race)
+        const traitData = {
+            "dragonborn": ["breath_weapon_(dragonborn)","damage_resistance_(dragonborn)","draconic_ancestry_(black)_(dragonborn)","draconic_ancestry_(blue)_(dragonborn)","draconic_ancestry_(brass)_(dragonborn)","draconic_ancestry_(bronze)_(dragonborn)","draconic_ancestry_(copper)_(dragonborn)","draconic_ancestry_(dragonborn)","draconic_ancestry_(gold)_(dragonborn)","draconic_ancestry_(green)_(dragonborn)","draconic_ancestry_(red)_(dragonborn)","draconic_ancestry_(silver)_(dragonborn)","draconic_ancestry_(white)_(dragonborn)"],
+            "dwarf": ["dwarven_combat_training_(dwarf)","dwarven_resilience_(dwarf)","stonecunning_(dwarf)","tool_proficiency_(dwarf)"],
+            "elf": ["fey_ancestry","keen_senses_(elf)","trance_(elf)"],
+            "general": ["artificer's_lore","dwarven_toughness","elf_weapon_training","extra_language","high_elf_cantrip","naturally_stealthy","tinker"],
+            "gnome": ["gnome_cunning_(gnome)"],
+            "half-elf": ["skill_versatility_(half-elf)"],
+            "halfling": ["brave_(halfling)","halfling_nimbleness_(halfling)","lucky_(halfling)"],
+            "half-orc": ["menacing_(half-orc)","relentless_endurance_(half-orc)","savage_attacks_(half-orc)"],
+            "tiefling": ["hellish_resistance_(tiefling)","infernal_legacy_(tiefling)"]
         };
 
         // Spell data (spells organized by school of magic)
@@ -655,6 +676,42 @@
                 });
             });
 
+            // Trait category with subfolders (races)
+            const traitGallery = document.getElementById('gallery-trait');
+            const traitSubfiltersContainer = document.getElementById('trait-subfilters');
+
+            // Add "All" button for traits
+            const allTraitBtn = document.createElement('button');
+            allTraitBtn.className = 'subfilter-btn active';
+            allTraitBtn.dataset.subfilter = 'all';
+            allTraitBtn.textContent = 'All Races';
+            traitSubfiltersContainer.appendChild(allTraitBtn);
+
+            // Add buttons and images for each race
+            for (const [raceName, traits] of Object.entries(traitData)) {
+                // Add subfilter button
+                const btn = document.createElement('button');
+                btn.className = 'subfilter-btn';
+                btn.dataset.subfilter = raceName;
+                btn.textContent = `${raceName} (${traits.length})`;
+                traitSubfiltersContainer.appendChild(btn);
+
+                // Add images
+                traits.forEach(filename => {
+                    traitGallery.appendChild(createImageCard('trait', filename, raceName));
+                });
+            }
+
+            // Setup subfilter click handlers for traits
+            traitSubfiltersContainer.querySelectorAll('.subfilter-btn').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    traitSubfiltersContainer.querySelectorAll('.subfilter-btn').forEach(b => b.classList.remove('active'));
+                    btn.classList.add('active');
+                    currentTraitSubFilter = btn.dataset.subfilter;
+                    applyFilters();
+                });
+            });
+
             // Spell category with subfolders (schools of magic)
             const spellGallery = document.getElementById('gallery-spell');
             const spellSubfiltersContainer = document.getElementById('spell-subfilters');
@@ -697,6 +754,7 @@
         let currentSearch = '';
         let currentSubFilter = 'all';
         let currentSkillSubFilter = 'all';
+        let currentTraitSubFilter = 'all';
         let currentSpellSubFilter = 'all';
 
         function applyFilters() {
@@ -716,6 +774,10 @@
                 // Handle subfilter for skills
                 if (card.dataset.category === 'skill' && currentSkillSubFilter !== 'all') {
                     matchesSubFilter = card.dataset.subCategory === currentSkillSubFilter;
+                }
+                // Handle subfilter for traits
+                if (card.dataset.category === 'trait' && currentTraitSubFilter !== 'all') {
+                    matchesSubFilter = card.dataset.subCategory === currentTraitSubFilter;
                 }
                 // Handle subfilter for spells
                 if (card.dataset.category === 'spell' && currentSpellSubFilter !== 'all') {
@@ -742,6 +804,9 @@
 
             const skillSubfiltersContainer = document.getElementById('skill-subfilters');
             skillSubfiltersContainer.style.display = (currentFilter === 'all' || currentFilter === 'skill') ? 'flex' : 'none';
+
+            const traitSubfiltersContainer = document.getElementById('trait-subfilters');
+            traitSubfiltersContainer.style.display = (currentFilter === 'all' || currentFilter === 'trait') ? 'flex' : 'none';
 
             const spellSubfiltersContainer = document.getElementById('spell-subfilters');
             spellSubfiltersContainer.style.display = (currentFilter === 'all' || currentFilter === 'spell') ? 'flex' : 'none';
