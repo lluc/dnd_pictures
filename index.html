@@ -413,7 +413,7 @@
                 <input type="search" id="search" placeholder="Rechercher une image...">
             </div>
             <div class="filter-buttons">
-                <button class="filter-btn active" data-filter="all">Tout (1718)</button>
+                <button class="filter-btn active" data-filter="all">Tout (1724)</button>
                 <button class="filter-btn" data-filter="equipment">Equipment (237)</button>
                 <button class="filter-btn" data-filter="feature">Features (317)</button>
                 <button class="filter-btn" data-filter="magic-items">Magic Items (361)</button>
@@ -423,9 +423,10 @@
                 <button class="filter-btn" data-filter="trait">Traits (37)</button>
                 <button class="filter-btn" data-filter="spell">Spells (319)</button>
                 <button class="filter-btn" data-filter="race">Races (9)</button>
+                <button class="filter-btn" data-filter="rule">Rules (6)</button>
             </div>
         </div>
-        <div class="stats" id="stats">1718 images affichées</div>
+        <div class="stats" id="stats">1724 images affichées</div>
     </header>
 
     <main id="gallery-container">
@@ -487,6 +488,13 @@
             <div class="subcategory-filters" id="race-subfilters"></div>
             <div class="gallery" id="gallery-race"></div>
         </section>
+
+        <!-- Rules -->
+        <section class="category-section" data-category="rule">
+            <h2 class="category-title">Rules <span class="count">(6)</span></h2>
+            <div class="subcategory-filters" id="rule-subfilters"></div>
+            <div class="gallery" id="gallery-rule"></div>
+        </section>
     </main>
 
     <!-- Lightbox -->
@@ -535,6 +543,11 @@
         const raceData = {
             "moyennes": ["dragonborn","dwarf","elf","half-elf","half-orc","human","tiefling"],
             "petites": ["gnome","halfling"]
+        };
+
+        // Rule data (rules organized by category)
+        const ruleData = {
+            "rules": ["adventuring","appendix","combat","equipment","spellcasting","using_ability_scores"]
         };
 
         // Trait data (racial traits organized by race)
@@ -797,6 +810,42 @@
                     applyFilters();
                 });
             });
+
+            // Rule category with subfolders
+            const ruleGallery = document.getElementById('gallery-rule');
+            const ruleSubfiltersContainer = document.getElementById('rule-subfilters');
+
+            // Add "All" button for rules
+            const allRuleBtn = document.createElement('button');
+            allRuleBtn.className = 'subfilter-btn active';
+            allRuleBtn.dataset.subfilter = 'all';
+            allRuleBtn.textContent = 'All Rules';
+            ruleSubfiltersContainer.appendChild(allRuleBtn);
+
+            // Add buttons and images for each category
+            for (const [categoryName, rules] of Object.entries(ruleData)) {
+                // Add subfilter button
+                const btn = document.createElement('button');
+                btn.className = 'subfilter-btn';
+                btn.dataset.subfilter = categoryName;
+                btn.textContent = `${categoryName} (${rules.length})`;
+                ruleSubfiltersContainer.appendChild(btn);
+
+                // Add images
+                rules.forEach(filename => {
+                    ruleGallery.appendChild(createImageCard('rule', filename, categoryName));
+                });
+            }
+
+            // Setup subfilter click handlers for rules
+            ruleSubfiltersContainer.querySelectorAll('.subfilter-btn').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    ruleSubfiltersContainer.querySelectorAll('.subfilter-btn').forEach(b => b.classList.remove('active'));
+                    btn.classList.add('active');
+                    currentRuleSubFilter = btn.dataset.subfilter;
+                    applyFilters();
+                });
+            });
         }
 
         // Filter functions
@@ -807,6 +856,7 @@
         let currentTraitSubFilter = 'all';
         let currentSpellSubFilter = 'all';
         let currentRaceSubFilter = 'all';
+        let currentRuleSubFilter = 'all';
 
         function applyFilters() {
             const cards = document.querySelectorAll('.image-card');
@@ -838,6 +888,10 @@
                 if (card.dataset.category === 'race' && currentRaceSubFilter !== 'all') {
                     matchesSubFilter = card.dataset.subCategory === currentRaceSubFilter;
                 }
+                // Handle subfilter for rules
+                if (card.dataset.category === 'rule' && currentRuleSubFilter !== 'all') {
+                    matchesSubFilter = card.dataset.subCategory === currentRuleSubFilter;
+                }
 
                 const isVisible = matchesFilter && matchesSearch && matchesSubFilter;
 
@@ -868,6 +922,9 @@
 
             const raceSubfiltersContainer = document.getElementById('race-subfilters');
             raceSubfiltersContainer.style.display = (currentFilter === 'all' || currentFilter === 'race') ? 'flex' : 'none';
+
+            const ruleSubfiltersContainer = document.getElementById('rule-subfilters');
+            ruleSubfiltersContainer.style.display = (currentFilter === 'all' || currentFilter === 'rule') ? 'flex' : 'none';
 
             document.getElementById('stats').textContent = `${visibleCount} image${visibleCount > 1 ? 's' : ''} affichée${visibleCount > 1 ? 's' : ''}`;
         }
