@@ -31,6 +31,7 @@ jobs:
         run: |
           mkdir -p _site
           cp index.html _site/
+          cp favicon.ico _site/
           cp -r pictures_webp _site/
           cp -r pictures_webp_v2 _site/
           cp LICENSE _site/ 2>/dev/null || true
