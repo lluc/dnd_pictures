@@ -1293,18 +1293,32 @@
             cat.textContent = subCategory
                 ? `${category} / ${subCategory}`
                 : category.replace('-', ' ');
+
+            // Add hash to URL for back button support
+            if (window.location.hash !== '#lightbox') {
+                window.history.pushState(null, '', '#lightbox');
+            }
+
             lightbox.classList.add('active');
             document.body.style.overflow = 'hidden';
         }
 
-        function closeLightbox() {
-            document.getElementById('lightbox').classList.remove('active');
+        function closeLightbox(fromPopState = false) {
+            const lightbox = document.getElementById('lightbox');
+            if (!lightbox.classList.contains('active')) return;
+
+            lightbox.classList.remove('active');
             document.body.style.overflow = '';
             // Clean up comparison lightbox elements if present
             const versionToggle = document.querySelector('.lightbox-version-toggle');
             if (versionToggle) versionToggle.remove();
             const compareView = document.querySelector('.lightbox-compare');
             if (compareView) compareView.remove();
+
+            // Remove hash if not already triggered by back button
+            if (!fromPopState && window.location.hash === '#lightbox') {
+                window.history.back();
+            }
         }
 
         // Comparison lightbox for V1/V2 side-by-side
@@ -1392,11 +1406,21 @@
             // Initial display
             updateDisplay('compare');
 
+            // Add hash to URL for back button support
+            if (window.location.hash !== '#lightbox') {
+                window.history.pushState(null, '', '#lightbox');
+            }
+
             lightbox.classList.add('active');
             document.body.style.overflow = 'hidden';
         }
 
-        document.getElementById('lightbox-close').addEventListener('click', closeLightbox);
+        // Handle browser back button
+        window.addEventListener('popstate', () => {
+            closeLightbox(true);
+        });
+
+        document.getElementById('lightbox-close').addEventListener('click', () => closeLightbox());
         document.getElementById('lightbox').addEventListener('click', (e) => {
             if (e.target.id === 'lightbox') closeLightbox();
         });
