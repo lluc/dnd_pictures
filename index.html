@@ -196,7 +196,8 @@
             border-color: #c9a227;
         }
 
-        .image-card.hidden {
+        .image-card.hidden,
+        .image-card-comparison.hidden {
             display: none;
         }
 
@@ -215,6 +216,198 @@
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
+        }
+
+        /* Comparison Cards (V1/V2 side-by-side) */
+        .image-card-comparison {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 12px;
+            overflow: hidden;
+            transition: all 0.3s;
+            cursor: pointer;
+            border: 1px solid rgba(201, 162, 39, 0.2);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .image-card-comparison:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(201, 162, 39, 0.2);
+            border-color: #c9a227;
+        }
+
+        .comparison-images {
+            display: flex;
+            gap: 2px;
+            background: rgba(0, 0, 0, 0.3);
+        }
+
+        .comparison-images .version {
+            flex: 1;
+            position: relative;
+            min-width: 0;
+        }
+
+        .comparison-images .version img {
+            width: 100%;
+            height: 140px;
+            object-fit: cover;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        .comparison-images .version img.loaded {
+            opacity: 1;
+        }
+
+        .version-label {
+            position: absolute;
+            top: 5px;
+            left: 5px;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 0.65rem;
+            font-weight: bold;
+            z-index: 1;
+        }
+
+        .version-label.v1 {
+            background: rgba(50, 80, 120, 0.9);
+            color: #8cb4ff;
+        }
+
+        .version-label.v2 {
+            background: rgba(120, 80, 50, 0.9);
+            color: #ffb88c;
+        }
+
+        .comparison-images .version.missing {
+            background: rgba(60, 60, 60, 0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 140px;
+        }
+
+        .comparison-images .version.missing span {
+            color: #666;
+            font-size: 0.7rem;
+        }
+
+        .image-card-comparison .name {
+            padding: 10px;
+            text-align: center;
+            font-size: 0.8rem;
+            color: #ddd;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        /* Gallery in comparison mode needs wider cards */
+        .gallery.comparison-mode {
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+        }
+
+        /* Lightbox version toggle */
+        .lightbox-version-toggle {
+            position: absolute;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 10px;
+            z-index: 1001;
+        }
+
+        .version-btn {
+            background: rgba(40, 40, 60, 0.9);
+            border: 1px solid rgba(201, 162, 39, 0.3);
+            color: #aaa;
+            padding: 8px 20px;
+            border-radius: 20px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 0.9rem;
+        }
+
+        .version-btn:hover {
+            border-color: #c9a227;
+            color: #c9a227;
+        }
+
+        .version-btn.active {
+            background: rgba(201, 162, 39, 0.2);
+            border-color: #c9a227;
+            color: #c9a227;
+        }
+
+        /* Lightbox comparison view */
+        .lightbox-compare {
+            display: flex;
+            gap: 20px;
+            max-width: 90vw;
+            max-height: 70vh;
+        }
+
+        .lightbox-compare .compare-side {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .lightbox-compare .compare-side img {
+            max-height: 60vh;
+            max-width: 100%;
+            object-fit: contain;
+            border-radius: 8px;
+        }
+
+        .lightbox-compare .compare-label {
+            margin-top: 10px;
+            padding: 5px 15px;
+            border-radius: 15px;
+            font-size: 0.9rem;
+            font-weight: bold;
+        }
+
+        .lightbox-compare .compare-label.v1 {
+            background: rgba(50, 80, 120, 0.9);
+            color: #8cb4ff;
+        }
+
+        .lightbox-compare .compare-label.v2 {
+            background: rgba(120, 80, 50, 0.9);
+            color: #ffb88c;
+        }
+
+        @media (max-width: 768px) {
+            .gallery.comparison-mode {
+                grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+            }
+
+            .comparison-images .version img {
+                height: 100px;
+            }
+
+            .lightbox-compare {
+                flex-direction: column;
+                gap: 10px;
+            }
+
+            .lightbox-compare .compare-side img {
+                max-height: 35vh;
+            }
+
+            .lightbox-version-toggle {
+                top: 10px;
+            }
+
+            .version-btn {
+                padding: 6px 12px;
+                font-size: 0.8rem;
+            }
         }
 
         /* Lightbox */
@@ -637,6 +830,76 @@
             return card;
         }
 
+        // Create comparison card (V1/V2 side-by-side)
+        function createComparisonCard(category, filename, subCategory = null) {
+            const card = document.createElement('div');
+            card.className = 'image-card-comparison';
+            card.dataset.category = category;
+            card.dataset.name = filename.toLowerCase();
+            if (subCategory) {
+                card.dataset.subCategory = subCategory;
+            }
+
+            // Container for both versions
+            const imagesContainer = document.createElement('div');
+            imagesContainer.className = 'comparison-images';
+
+            // V1 Image
+            const v1Container = document.createElement('div');
+            v1Container.className = 'version v1';
+            const v1Img = document.createElement('img');
+            const v1Path = subCategory
+                ? `pictures_webp/${category}/${subCategory}/${filename}.webp`
+                : `pictures_webp/${category}/${filename}.webp`;
+            v1Img.src = v1Path;
+            v1Img.alt = `V1 - ${formatName(filename)}`;
+            v1Img.loading = 'lazy';
+            v1Img.onload = () => v1Img.classList.add('loaded');
+            const v1Label = document.createElement('span');
+            v1Label.className = 'version-label v1';
+            v1Label.textContent = 'V1';
+            v1Container.appendChild(v1Img);
+            v1Container.appendChild(v1Label);
+
+            // V2 Image
+            const v2Container = document.createElement('div');
+            v2Container.className = 'version v2';
+            const v2Img = document.createElement('img');
+            const v2Path = subCategory
+                ? `pictures_webp_v2/${category}/${subCategory}/${filename}.webp`
+                : `pictures_webp_v2/${category}/${filename}.webp`;
+            v2Img.src = v2Path;
+            v2Img.alt = `V2 - ${formatName(filename)}`;
+            v2Img.loading = 'lazy';
+            v2Img.onload = () => v2Img.classList.add('loaded');
+            v2Img.onerror = () => {
+                v2Container.classList.add('missing');
+                v2Container.innerHTML = '<span>No V2</span>';
+            };
+            const v2Label = document.createElement('span');
+            v2Label.className = 'version-label v2';
+            v2Label.textContent = 'V2';
+            v2Container.appendChild(v2Img);
+            v2Container.appendChild(v2Label);
+
+            imagesContainer.appendChild(v1Container);
+            imagesContainer.appendChild(v2Container);
+
+            // Name
+            const name = document.createElement('div');
+            name.className = 'name';
+            name.textContent = formatName(filename);
+            name.title = formatName(filename);
+
+            card.appendChild(imagesContainer);
+            card.appendChild(name);
+
+            // Click opens comparison lightbox
+            card.addEventListener('click', () => openComparisonLightbox(category, filename, subCategory));
+
+            return card;
+        }
+
         // Initialize gallery
         function initGallery() {
             // Regular categories
@@ -683,8 +946,9 @@
                 });
             });
 
-            // Equipment category with subfolders (D&D types)
+            // Equipment category with subfolders (D&D types) - Using comparison mode for V1/V2
             const equipmentGallery = document.getElementById('gallery-equipment');
+            equipmentGallery.classList.add('comparison-mode'); // Enable wider cards for comparison
             const equipmentSubfiltersContainer = document.getElementById('equipment-subfilters');
 
             // Add "All" button for equipment
@@ -703,9 +967,9 @@
                 btn.textContent = `${typeName.replace(/_/g, ' ')} (${items.length})`;
                 equipmentSubfiltersContainer.appendChild(btn);
 
-                // Add images
+                // Add comparison cards (V1/V2 side-by-side)
                 items.forEach(filename => {
-                    equipmentGallery.appendChild(createImageCard('equipment', filename, typeName));
+                    equipmentGallery.appendChild(createComparisonCard('equipment', filename, typeName));
                 });
             }
 
@@ -715,7 +979,16 @@
                     equipmentSubfiltersContainer.querySelectorAll('.subfilter-btn').forEach(b => b.classList.remove('active'));
                     btn.classList.add('active');
                     currentEquipmentSubFilter = btn.dataset.subfilter;
+                    // When clicking a subfilter (not "All Types"), also filter to equipment category only
+                    if (currentEquipmentSubFilter !== 'all') {
+                        currentFilter = 'equipment';
+                        document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+                        const equipBtn = document.querySelector('.filter-btn[data-filter="equipment"]');
+                        if (equipBtn) equipBtn.classList.add('active');
+                    }
                     applyFilters();
+                    // Scroll to equipment section
+                    document.getElementById('gallery-equipment').scrollIntoView({ behavior: 'smooth', block: 'start' });
                 });
             });
 
@@ -912,7 +1185,7 @@
         let currentEquipmentSubFilter = 'all';
 
         function applyFilters() {
-            const cards = document.querySelectorAll('.image-card');
+            const cards = document.querySelectorAll('.image-card, .image-card-comparison');
             const sections = document.querySelectorAll('.category-section');
             let visibleCount = 0;
 
@@ -959,7 +1232,7 @@
             // Show/hide sections
             sections.forEach(section => {
                 const category = section.dataset.category;
-                const hasVisibleCards = section.querySelectorAll('.image-card:not(.hidden)').length > 0;
+                const hasVisibleCards = section.querySelectorAll('.image-card:not(.hidden), .image-card-comparison:not(.hidden)').length > 0;
                 const matchesFilter = currentFilter === 'all' || category === currentFilter;
                 section.style.display = (matchesFilter && hasVisibleCards) ? 'block' : 'none';
             });
@@ -1027,6 +1300,100 @@
         function closeLightbox() {
             document.getElementById('lightbox').classList.remove('active');
             document.body.style.overflow = '';
+            // Clean up comparison lightbox elements if present
+            const versionToggle = document.querySelector('.lightbox-version-toggle');
+            if (versionToggle) versionToggle.remove();
+            const compareView = document.querySelector('.lightbox-compare');
+            if (compareView) compareView.remove();
+        }
+
+        // Comparison lightbox for V1/V2 side-by-side
+        let currentComparisonMode = 'compare'; // 'v1', 'v2', or 'compare'
+
+        function openComparisonLightbox(category, filename, subCategory = null) {
+            const lightbox = document.getElementById('lightbox');
+            const img = document.getElementById('lightbox-img');
+            const title = document.getElementById('lightbox-title');
+            const cat = document.getElementById('lightbox-category');
+
+            const v1Path = subCategory
+                ? `pictures_webp/${category}/${subCategory}/${filename}.webp`
+                : `pictures_webp/${category}/${filename}.webp`;
+            const v2Path = subCategory
+                ? `pictures_webp_v2/${category}/${subCategory}/${filename}.webp`
+                : `pictures_webp_v2/${category}/${filename}.webp`;
+
+            // Remove existing version toggle if any
+            let versionToggle = document.querySelector('.lightbox-version-toggle');
+            if (versionToggle) versionToggle.remove();
+
+            // Create version toggle buttons
+            versionToggle = document.createElement('div');
+            versionToggle.className = 'lightbox-version-toggle';
+            versionToggle.innerHTML = `
+                <button class="version-btn" data-version="v1">V1</button>
+                <button class="version-btn" data-version="v2">V2</button>
+                <button class="version-btn active" data-version="compare">Compare</button>
+            `;
+            lightbox.insertBefore(versionToggle, lightbox.firstChild.nextSibling);
+
+            // Set title and category
+            title.textContent = formatName(filename);
+            cat.textContent = subCategory
+                ? `${category} / ${subCategory}`
+                : category.replace('-', ' ');
+
+            // Function to update display based on mode
+            function updateDisplay(mode) {
+                currentComparisonMode = mode;
+
+                // Update active button
+                versionToggle.querySelectorAll('.version-btn').forEach(btn => {
+                    btn.classList.toggle('active', btn.dataset.version === mode);
+                });
+
+                // Remove comparison view if exists
+                let compareView = document.querySelector('.lightbox-compare');
+                if (compareView) compareView.remove();
+
+                if (mode === 'compare') {
+                    // Hide single image
+                    img.style.display = 'none';
+
+                    // Create comparison view
+                    compareView = document.createElement('div');
+                    compareView.className = 'lightbox-compare';
+                    compareView.innerHTML = `
+                        <div class="compare-side">
+                            <img src="${v1Path}" alt="V1 - ${formatName(filename)}">
+                            <span class="compare-label v1">V1</span>
+                        </div>
+                        <div class="compare-side">
+                            <img src="${v2Path}" alt="V2 - ${formatName(filename)}">
+                            <span class="compare-label v2">V2</span>
+                        </div>
+                    `;
+                    img.parentNode.insertBefore(compareView, img);
+                } else {
+                    // Show single image
+                    img.style.display = '';
+                    img.src = mode === 'v1' ? v1Path : v2Path;
+                }
+            }
+
+            // Setup click handlers for version buttons
+            versionToggle.querySelectorAll('.version-btn').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    updateDisplay(btn.dataset.version);
+                });
+            });
+
+            // Initial display
+            updateDisplay('compare');
+
+            lightbox.classList.add('active');
+            document.body.style.overflow = 'hidden';
         }
 
         document.getElementById('lightbox-close').addEventListener('click', closeLightbox);

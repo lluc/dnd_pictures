@@ -5,8 +5,8 @@
 # en conservant la structure des sous-répertoires (récursif)
 # Ne convertit que les images qui n'ont pas encore de WEBP correspondant
 
-SOURCE_DIR="pictures"
-DEST_DIR="pictures_webp"
+SOURCE_DIR="${1:-pictures}"
+DEST_DIR="${2:-pictures_webp}"
 QUALITY=80
 
 # Couleurs pour l'affichage
