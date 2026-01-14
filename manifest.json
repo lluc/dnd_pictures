@@ -1,0 +1,23 @@
+{
+  "name": "D&D 5e Image Gallery",
+  "short_name": "D&D Gallery",
+  "description": "Galerie d'images pour Dungeons & Dragons 5e",
+  "start_url": "/dnd_pictures/",
+  "display": "standalone",
+  "background_color": "#1a1a2e",
+  "theme_color": "#c9a227",
+  "icons": [
+    {
+      "src": "icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}
