@@ -653,6 +653,7 @@
         <!-- Monsters -->
         <section class="category-section" data-category="monsters">
             <h2 class="category-title">Monsters <span class="count">(334)</span></h2>
+            <div class="subcategory-filters" id="monsters-subfilters"></div>
             <div class="gallery" id="gallery-monsters"></div>
         </section>
 
@@ -764,6 +765,19 @@
             "montures": ["camel","donkey","elephant","horse,_draft","horse,_riding","mastiff","mule","pony","warhorse"],
             "vehicules": ["carriage","cart","chariot","galley","keelboat","longship","rowboat","sailing_ship","sled","wagon","warship"],
             "equipement_aventurier": ["abacus","acid_(vial)","alchemist's_fire_(flask)","alms_box","animal_feed_(1_day)","antitoxin_(vial)","backpack","ball_bearings_(bag_of_1,000)","barrel","basket","bedroll","bell","bit_and_bridle","blanket","block_and_tackle","block_of_incense","book","bottle,_glass","bucket","caltrops","candle","case,_crossbow_bolt","case,_map_or_scroll","censer","chain_(10_feet)","chalk_(1_piece)","chest","clothes,_common","clothes,_costume","clothes,_fine","clothes,_traveler's","component_pouch","crowbar","fishing_tackle","flask_or_tankard","grappling_hook","hammer","holy_water_(flask)","hourglass","hunting_trap","ink_(1_ounce_bottle)","ink_pen","jug_or_pitcher","ladder_(10-foot)","lamp","lantern,_bullseye","lantern,_hooded","little_bag_of_sand","lock","magnifying_glass","manacles","mess_kit","mirror,_steel","oil_(flask)","paper_(one_sheet)","parchment_(one_sheet)","perfume_(vial)","pick,_miner's","piton","poison,_basic_(vial)","pole_(10-foot)","pot,_iron","pouch","quiver","ram,_portable","rations_(1_day)","robes","rope,_hempen_(50_feet)","rope,_silk_(50_feet)","sack","saddlebags","saddle,_exotic","saddle,_military","saddle,_pack","saddle,_riding","scale,_merchant's","sealing_wax","shovel","signal_whistle","signet_ring","small_knife","soap","spellbook","spike,_iron","spyglass","stabling_(1_day)","string_(10_feet)","tent,_two-person","thieves'_tools","tinderbox","torch","vestments","vial","waterskin","whetstone"]
+        };
+
+        // Monster V2 data (monsters organized by D&D creature type for V2 images)
+        const monsterDataV2 = {
+            "bêtes": ["ape","axe_beak","baboon","badger","bat","black_bear","blood_hawk","boar","brown_bear","camel","cat","constrictor_snake","crab","crocodile","deer","dire_wolf","draft_horse","eagle","elephant","elk","flying_snake","frog","giant_ape","giant_badger","giant_bat","giant_boar","giant_centipede","giant_constrictor_snake","giant_crab","giant_crocodile","giant_eagle","giant_elk","giant_fire_beetle","giant_frog","giant_goat","giant_hyena","giant_lizard","giant_octopus","giant_owl","giant_poisonous_snake","giant_rat_(diseased)","giant_rat","giant_scorpion","giant_sea_horse","giant_shark","giant_spider","giant_toad","giant_vulture","giant_wasp","giant_weasel","giant_wolf_spider","goat","hawk","hunter_shark","hyena","jackal","killer_whale","lion","lizard","mammoth","mastiff","mule","octopus","owl","panther","plesiosaurus","poisonous_snake","polar_bear","pony","quipper","rat","raven","reef_shark","rhinoceros","riding_horse","saber-toothed_tiger","scorpion","sea_horse","spider","stirge","tiger","triceratops","tyrannosaurus_rex","vulture","warhorse","weasel","wolf"],
+            "célestes": ["couatl","deva","pegasus","planetar","solar","unicorn"],
+            "divers": ["aboleth","androsphinx","animated_armor","ankheg","awakened_shrub","awakened_tree","basilisk","behir","black_pudding","bulette","centaur","chimera","chuul","clay_golem","cloaker","cloud_giant","cockatrice","darkmantle","death_dog","doppelganger","drider","ettercap","ettin","fire_giant","flesh_golem","flying_sword","frost_giant","gelatinous_cube","gibbering_mouther","gorgon","gray_ooze","grick","griffon","guardian_naga","gynosphinx","harpy","hill_giant","hippogriff","homunculus","hydra","iron_golem","kraken","lamia","manticore","medusa","merrow","mimic","minotaur","ochre_jelly","ogre","oni","otyugh","owlbear","phase_spider","purple_worm","remorhaz","roc","roper","rug_of_smothering","rust_monster","shambling_mound","shield_guardian","shrieker","spirit_naga","stone_giant","stone_golem","storm_giant","swarm_of_bats","swarm_of_beetles","swarm_of_centipedes","swarm_of_insects","swarm_of_poisonous_snakes","swarm_of_quippers","swarm_of_rats","swarm_of_ravens","swarm_of_spiders","swarm_of_wasps","tarrasque","treant","troll","violet_fungus","winter_wolf","worg"],
+            "dragons": ["adult_black_dragon","adult_blue_dragon","adult_brass_dragon","adult_bronze_dragon","adult_copper_dragon","adult_gold_dragon","adult_green_dragon","adult_red_dragon","adult_silver_dragon","adult_white_dragon","ancient_black_dragon","ancient_blue_dragon","ancient_brass_dragon","ancient_bronze_dragon","ancient_copper_dragon","ancient_gold_dragon","ancient_green_dragon","ancient_red_dragon","ancient_silver_dragon","ancient_white_dragon","black_dragon_wyrmling","blue_dragon_wyrmling","brass_dragon_wyrmling","bronze_dragon_wyrmling","copper_dragon_wyrmling","dragon_turtle","gold_dragon_wyrmling","green_dragon_wyrmling","pseudodragon","red_dragon_wyrmling","silver_dragon_wyrmling","white_dragon_wyrmling","wyvern","young_black_dragon","young_blue_dragon","young_brass_dragon","young_bronze_dragon","young_copper_dragon","young_gold_dragon","young_green_dragon","young_red_dragon","young_silver_dragon","young_white_dragon"],
+            "élémentaires": ["air_elemental","azer","djinni","dust_mephit","earth_elemental","efreeti","fire_elemental","gargoyle","ice_mephit","invisible_stalker","magma_mephit","magmin","salamander","steam_mephit","water_elemental","xorn"],
+            "fées": ["blink_dog","dryad","green_hag","satyr","sea_hag","sprite"],
+            "fiélons": ["balor","barbed_devil","bearded_devil","bone_devil","chain_devil","dretch","erinyes","glabrezu","hell_hound","hezrou","horned_devil","ice_devil","imp","lemure","marilith","nalfeshnee","night_hag","nightmare","pit_fiend","quasit","rakshasa","succubus_incubus","vrock"],
+            "humanoïdes": ["acolyte","archmage","assassin","bandit_captain","bandit","berserker","bugbear","commoner","cult_fanatic","cultist","deep_gnome_(svirfneblin)","drow","druid","duergar","gladiator","gnoll","goblin","grimlock","guard","half-red_dragon_veteran","hobgoblin","knight","kobold","lizardfolk","mage","merfolk","noble","orc","priest","sahuagin","scout","spy","thug","tribal_warrior","veteran","werebear,_bear_form","werebear,_human_form","werebear,_hybrid_form","wereboar,_boar_form","wereboar,_human_form","wereboar,_hybrid_form","wererat,_human_form","wererat,_hybrid_form","wererat,_rat_form","weretiger,_human_form","weretiger,_hybrid_form","weretiger,_tiger_form","werewolf,_human_form","werewolf,_hybrid_form","werewolf,_wolf_form"],
+            "morts-vivants": ["ghast","ghost","ghoul","lich","minotaur_skeleton","mummy_lord","mummy","ogre_zombie","shadow","skeleton","specter","vampire,_bat_form","vampire,_mist_form","vampire_spawn","vampire,_vampire_form","warhorse_skeleton","wight","will-o'-wisp","wraith","zombie"]
         };
 
         // Trait data (racial traits organized by race)
@@ -907,15 +921,125 @@
             return card;
         }
 
+        // Create monster comparison card (V1 flat, V2 with subcategories)
+        function createMonsterComparisonCard(filename, v2Category) {
+            const card = document.createElement('div');
+            card.className = 'image-card-comparison';
+            card.dataset.category = 'monsters';
+            card.dataset.name = filename.toLowerCase();
+            card.dataset.subCategory = v2Category;
+
+            // Container for both versions
+            const imagesContainer = document.createElement('div');
+            imagesContainer.className = 'comparison-images';
+
+            // V1 Image (flat structure)
+            const v1Container = document.createElement('div');
+            v1Container.className = 'version v1';
+            const v1Img = document.createElement('img');
+            const v1Path = `pictures_webp/monsters/${filename}.webp`;
+            v1Img.src = v1Path;
+            v1Img.alt = `V1 - ${formatName(filename)}`;
+            v1Img.loading = 'lazy';
+            v1Img.onload = () => v1Img.classList.add('loaded');
+            const v1Label = document.createElement('span');
+            v1Label.className = 'version-label v1';
+            v1Label.textContent = 'V1';
+            v1Container.appendChild(v1Img);
+            v1Container.appendChild(v1Label);
+
+            // V2 Image (with subcategory)
+            const v2Container = document.createElement('div');
+            v2Container.className = 'version v2';
+            const v2Img = document.createElement('img');
+            const v2Path = `pictures_webp_v2/monsters/${v2Category}/${filename}.webp`;
+            v2Img.src = v2Path;
+            v2Img.alt = `V2 - ${formatName(filename)}`;
+            v2Img.loading = 'lazy';
+            v2Img.onload = () => v2Img.classList.add('loaded');
+            v2Img.onerror = () => {
+                v2Container.classList.add('missing');
+                v2Container.innerHTML = '<span>No V2</span>';
+            };
+            const v2Label = document.createElement('span');
+            v2Label.className = 'version-label v2';
+            v2Label.textContent = 'V2';
+            v2Container.appendChild(v2Img);
+            v2Container.appendChild(v2Label);
+
+            imagesContainer.appendChild(v1Container);
+            imagesContainer.appendChild(v2Container);
+
+            // Name
+            const name = document.createElement('div');
+            name.className = 'name';
+            name.textContent = formatName(filename);
+            name.title = formatName(filename);
+
+            card.appendChild(imagesContainer);
+            card.appendChild(name);
+
+            // Click opens monster comparison lightbox
+            card.addEventListener('click', () => openMonsterComparisonLightbox(filename, v2Category));
+
+            return card;
+        }
+
         // Initialize gallery
         function initGallery() {
-            // Regular categories
+            // Regular categories (excluding monsters which uses comparison cards)
             for (const [category, images] of Object.entries(imageData)) {
+                if (category === 'monsters') continue; // Handled separately with comparison cards
                 const gallery = document.getElementById(`gallery-${category}`);
                 images.forEach(filename => {
                     gallery.appendChild(createImageCard(category, filename));
                 });
             }
+
+            // Monsters category with V1/V2 comparison cards
+            const monstersGallery = document.getElementById('gallery-monsters');
+            const monstersSubfiltersContainer = document.getElementById('monsters-subfilters');
+
+            // Add "All" button for monsters
+            const allMonstersBtn = document.createElement('button');
+            allMonstersBtn.className = 'subfilter-btn active';
+            allMonstersBtn.dataset.subfilter = 'all';
+            allMonstersBtn.textContent = 'All Types';
+            monstersSubfiltersContainer.appendChild(allMonstersBtn);
+
+            // Add buttons and images for each monster type
+            for (const [typeName, monsters] of Object.entries(monsterDataV2)) {
+                // Add subfilter button
+                const btn = document.createElement('button');
+                btn.className = 'subfilter-btn';
+                btn.dataset.subfilter = typeName;
+                btn.textContent = `${typeName} (${monsters.length})`;
+                monstersSubfiltersContainer.appendChild(btn);
+
+                // Add comparison cards (V1/V2 side-by-side)
+                monsters.forEach(filename => {
+                    monstersGallery.appendChild(createMonsterComparisonCard(filename, typeName));
+                });
+            }
+
+            // Setup subfilter click handlers for monsters
+            monstersSubfiltersContainer.querySelectorAll('.subfilter-btn').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    monstersSubfiltersContainer.querySelectorAll('.subfilter-btn').forEach(b => b.classList.remove('active'));
+                    btn.classList.add('active');
+                    currentMonstersSubFilter = btn.dataset.subfilter;
+                    // When clicking a subfilter (not "All Types"), also filter to monsters category only
+                    if (currentMonstersSubFilter !== 'all') {
+                        currentFilter = 'monsters';
+                        document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+                        const monstersBtn = document.querySelector('.filter-btn[data-filter="monsters"]');
+                        if (monstersBtn) monstersBtn.classList.add('active');
+                    }
+                    applyFilters();
+                    // Scroll to monsters section
+                    document.getElementById('gallery-monsters').scrollIntoView({ behavior: 'smooth', block: 'start' });
+                });
+            });
 
             // Feature category with subfolders
             const featureGallery = document.getElementById('gallery-feature');
@@ -1190,6 +1314,7 @@
         let currentRaceSubFilter = 'all';
         let currentRuleSubFilter = 'all';
         let currentEquipmentSubFilter = 'all';
+        let currentMonstersSubFilter = 'all';
 
         function applyFilters() {
             const cards = document.querySelectorAll('.image-card, .image-card-comparison');
@@ -1229,6 +1354,10 @@
                 if (card.dataset.category === 'equipment' && currentEquipmentSubFilter !== 'all') {
                     matchesSubFilter = card.dataset.subCategory === currentEquipmentSubFilter;
                 }
+                // Handle subfilter for monsters
+                if (card.dataset.category === 'monsters' && currentMonstersSubFilter !== 'all') {
+                    matchesSubFilter = card.dataset.subCategory === currentMonstersSubFilter;
+                }
 
                 const isVisible = matchesFilter && matchesSearch && matchesSubFilter;
 
@@ -1247,6 +1376,9 @@
             // Show/hide subfilters containers
             const equipmentSubfiltersContainer = document.getElementById('equipment-subfilters');
             equipmentSubfiltersContainer.style.display = (currentFilter === 'all' || currentFilter === 'equipment') ? 'flex' : 'none';
+
+            const monstersSubfiltersContainer = document.getElementById('monsters-subfilters');
+            monstersSubfiltersContainer.style.display = (currentFilter === 'all' || currentFilter === 'monsters') ? 'flex' : 'none';
 
             const featureSubfiltersContainer = document.getElementById('feature-subfilters');
             featureSubfiltersContainer.style.display = (currentFilter === 'all' || currentFilter === 'feature') ? 'flex' : 'none';
@@ -1363,6 +1495,93 @@
             cat.textContent = subCategory
                 ? `${category} / ${subCategory}`
                 : category.replace('-', ' ');
+
+            // Function to update display based on mode
+            function updateDisplay(mode) {
+                currentComparisonMode = mode;
+
+                // Update active button
+                versionToggle.querySelectorAll('.version-btn').forEach(btn => {
+                    btn.classList.toggle('active', btn.dataset.version === mode);
+                });
+
+                // Remove comparison view if exists
+                let compareView = document.querySelector('.lightbox-compare');
+                if (compareView) compareView.remove();
+
+                if (mode === 'compare') {
+                    // Hide single image
+                    img.style.display = 'none';
+
+                    // Create comparison view
+                    compareView = document.createElement('div');
+                    compareView.className = 'lightbox-compare';
+                    compareView.innerHTML = `
+                        <div class="compare-side">
+                            <img src="${v1Path}" alt="V1 - ${formatName(filename)}">
+                            <span class="compare-label v1">V1</span>
+                        </div>
+                        <div class="compare-side">
+                            <img src="${v2Path}" alt="V2 - ${formatName(filename)}">
+                            <span class="compare-label v2">V2</span>
+                        </div>
+                    `;
+                    img.parentNode.insertBefore(compareView, img);
+                } else {
+                    // Show single image
+                    img.style.display = '';
+                    img.src = mode === 'v1' ? v1Path : v2Path;
+                }
+            }
+
+            // Setup click handlers for version buttons
+            versionToggle.querySelectorAll('.version-btn').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    updateDisplay(btn.dataset.version);
+                });
+            });
+
+            // Initial display
+            updateDisplay('compare');
+
+            // Add hash to URL for back button support
+            if (window.location.hash !== '#lightbox') {
+                window.history.pushState(null, '', '#lightbox');
+            }
+
+            lightbox.classList.add('active');
+            document.body.style.overflow = 'hidden';
+        }
+
+        // Monster comparison lightbox (V1 flat, V2 with subcategories)
+        function openMonsterComparisonLightbox(filename, v2Category) {
+            const lightbox = document.getElementById('lightbox');
+            const img = document.getElementById('lightbox-img');
+            const title = document.getElementById('lightbox-title');
+            const cat = document.getElementById('lightbox-category');
+
+            // V1 is flat, V2 has subcategories
+            const v1Path = `pictures_webp/monsters/${filename}.webp`;
+            const v2Path = `pictures_webp_v2/monsters/${v2Category}/${filename}.webp`;
+
+            // Remove existing version toggle if any
+            let versionToggle = document.querySelector('.lightbox-version-toggle');
+            if (versionToggle) versionToggle.remove();
+
+            // Create version toggle buttons
+            versionToggle = document.createElement('div');
+            versionToggle.className = 'lightbox-version-toggle';
+            versionToggle.innerHTML = `
+                <button class="version-btn" data-version="v1">V1</button>
+                <button class="version-btn" data-version="v2">V2</button>
+                <button class="version-btn active" data-version="compare">Compare</button>
+            `;
+            lightbox.insertBefore(versionToggle, lightbox.firstChild.nextSibling);
+
+            // Set title and category
+            title.textContent = formatName(filename);
+            cat.textContent = `monsters / ${v2Category}`;
 
             // Function to update display based on mode
             function updateDisplay(mode) {
