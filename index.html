@@ -258,7 +258,8 @@
         .comparison-images .version img {
             width: 100%;
             height: 140px;
-            object-fit: cover;
+            object-fit: contain;
+            background: rgba(0, 0, 0, 0.2);
             opacity: 0;
             transition: opacity 0.3s;
         }
@@ -400,11 +401,19 @@
 
             .lightbox-compare {
                 flex-direction: column;
-                gap: 10px;
+                gap: 5px;
+                max-height: 72vh;
+                overflow-y: auto;
             }
 
             .lightbox-compare .compare-side img {
-                max-height: 35vh;
+                max-height: 30vh;
+            }
+
+            .lightbox-compare .compare-label {
+                margin-top: 3px;
+                padding: 2px 8px;
+                font-size: 0.7rem;
             }
 
             .lightbox-version-toggle {
@@ -414,6 +423,16 @@
             .version-btn {
                 padding: 6px 12px;
                 font-size: 0.8rem;
+            }
+
+            .lightbox-title {
+                font-size: 1.1rem;
+                margin-top: 8px;
+            }
+
+            .lightbox-category {
+                font-size: 0.8rem;
+                margin-bottom: 10px;
             }
         }
 
@@ -471,6 +490,7 @@
             font-size: 1rem;
             margin-top: 5px;
             text-transform: capitalize;
+            margin-bottom: 20px;
         }
 
         /* Responsive */
